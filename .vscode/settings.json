@@ -2,6 +2,8 @@
     "cSpell.words": [
         "creds",
         "dotenv",
-        "googleapiclient"
+        "googleapiclient",
+        "HKCU",
+        "HKLM"
     ]
 }
