@@ -7,7 +7,10 @@ const initializeApp = require('firebase/app').initializeApp;
 const getDatabase = require('firebase/database').getDatabase;
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv').config();
+const bcrypt = require('bcrypt');
 const fs = require('fs');
+const { child } = require('firebase/database');
+const SALT_ROUNDS = 15;
 const app = express();
 const PORT = 2909;
 
@@ -50,6 +53,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(express.static('Public'));
+app.use((request, response, next) => {
+    response.status(404).json({
+        // trigger react to redirect to 404 page
+        status: 404,
+        message: 'URL does not exist or permission denied! Please try again!'
+    });
+})
 
 app.listen(PORT, (err) => {
     if (err) console.error(err.message);
@@ -57,22 +67,68 @@ app.listen(PORT, (err) => {
 });
 
 app.post('/register', (request, response) => {
-    database.ref('users').push({
-        email: request.body.email,
-        password: request.body.password,
-        role: 1,
+    bcrypt.hash(request.body.password, SALT_ROUNDS, (err, hash) => {
+        if (err){
+            response.json({
+                status: 400,
+                message: 'Something went wrong! Please try again later!'
+            })
+            response.end();
+            return;
+        }
+        database.ref('users').push({
+            email: request.body.email,
+            password: hash,
+            role: 1,
+        });
+        response.json({
+            status: 200,
+            message: 'Register successfully!',
+        })
+        response.end();
     });
-    response.json({
-        status: 200,
-        message: 'Register successfully, please login to continue!',
-    })
-    response.end();
 });
 
 app.post('/login', (request, response) => {
-    database.ref('users').get().then((snapshot) => {
-        
-    });
+    database.ref('users').orderByChild('email').equalTo(request.body.email).once('value', (snapshot) => {
+        if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const user = childSnapshot.val();
+                    bcrypt.compare(request.body.password, user.password, (err, result) => {
+                        if (err) {
+                            response.json({
+                                status: 400,
+                                message: 'Something went wrong! Please try again later!'
+                            })
+                            response.end();
+                            return;
+                        }
+                        if (result) {
+                            response.json({
+                                status: 200,
+                                message: 'Login successfully!',
+                                data: {
+                                    email: user.email,
+                                    role: user.role,
+                                }
+                            })
+                            response.end();
+                        } else {
+                            response.json({
+                                status: 401,
+                                message: 'Password is incorrect!',
+                            })
+                            response.end();
+                        }
+                    })
+                })
+        } else {
+            response.json({
+                status: 400,
+                message: 'Email does not exist!',
+            })
+        }
+    })
 })
 
 // Path: Backend/server.js
