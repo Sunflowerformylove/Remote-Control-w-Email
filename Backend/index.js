@@ -9,6 +9,7 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv').config();
 const bcrypt = require('bcrypt');
 const fs = require('fs');
+const session = require('express-session');
 const { child } = require('firebase/database');
 const SALT_ROUNDS = 15;
 const app = express();
@@ -53,6 +54,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(express.static('Public'));
+app.use(session({
+    secret: 'secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 15, // 15 days
+        secure: false,
+        httpOnly: false,
+    }
+}))
 app.use((request, response, next) => {
     response.status(404).json({
         // trigger react to redirect to 404 page
