@@ -100,7 +100,7 @@ app.post('/register', (request, response) => {
     });
 });
 
-app.post('/login', (request, response) => {
+app.post('/auth/login', (request, response) => {
     database.ref('users').orderByChild('email').equalTo(request.body.email).once('value', (snapshot) => {
         if (snapshot.exists()) {
                 snapshot.forEach((childSnapshot) => {
