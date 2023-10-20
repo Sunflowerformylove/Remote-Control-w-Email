@@ -1,6 +1,6 @@
 import Login from "./Components/Login";
 
-function App() {
+export default function App() {
   return (
     <div className="App">
       <Login />
