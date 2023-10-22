@@ -4,6 +4,7 @@ import './index.css';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import App from './App';
+import './Styles/Normalizer.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -20,7 +21,7 @@ root.render(
       pauseOnHover
       theme="dark"
       style={{ fontSize: "1.4rem" }}>
-      <App />
     </ToastContainer>
+    <App />
   </React.StrictMode>
 );
