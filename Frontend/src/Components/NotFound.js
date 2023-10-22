@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../Styles/404.css';
+import '../Styles/NotFound.css';
 import { Link } from 'react-router-dom';
 
 const NotFound = () => {
@@ -54,19 +54,21 @@ const NotFound = () => {
             <div className="container-floud">
                 <div className="col-xs-12 ground-color text-center">
                     <div className="container-error-404">
-                        <div className="clip">
-                            <div className="shadow">
-                                <span className="digit thirdDigit">{digit3}</span>
+                        <div className='clip-container'>
+                            <div className="clip">
+                                <div className="shadow">
+                                    <span className="digit thirdDigit">{digit3}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="clip">
-                            <div className="shadow">
-                                <span className="digit secondDigit">{digit2}</span>
+                            <div className="clip">
+                                <div className="shadow">
+                                    <span className="digit secondDigit">{digit2}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="clip">
-                            <div className="shadow">
-                                <span className="digit firstDigit">{digit1}</span>
+                            <div className="clip">
+                                <div className="shadow">
+                                    <span className="digit firstDigit">{digit1}</span>
+                                </div>
                             </div>
                         </div>
                         <div className="msg">
@@ -79,7 +81,6 @@ const NotFound = () => {
                             The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
                         </p>
                         <Link to="/" className='link-style'> <div className='button-86'>Back To Home</div> </Link>
-
                     </div>
                 </div>
             </div>
