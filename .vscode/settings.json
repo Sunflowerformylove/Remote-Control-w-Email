@@ -4,7 +4,8 @@
     "dotenv",
     "googleapiclient",
     "HKCU",
-    "HKLM"
+    "HKLM",
+    "Keylogger"
   ],
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

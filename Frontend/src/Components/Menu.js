@@ -5,7 +5,9 @@ import "../Styles/Menu.css"
 
 export default function Menu() {
     const menuRef = useRef(null);
-    const describeRef = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)]
+    const describeRef = [useRef(null), useRef(null), useRef(null), useRef(null),
+    useRef(null), useRef(null), useRef(null), useRef(null),
+    useRef(null), useRef(null)]
     function extendMenu() {
         menuRef.current.classList.toggle("extended");
         describeRef.forEach(element => {
@@ -23,11 +25,11 @@ export default function Menu() {
                     <div ref={describeRef[0]} className="describe">Shutdown</div>
                 </div>
                 <div className="functionality restart">
-                    <IonIcon icon={Icon.refreshCircleOutline} className="functionalityIcon"></IonIcon>
-                    <div ref={describeRef[1]} className="describe">Restart</div>
+                    <IonIcon icon={Icon.moonOutline} className="functionalityIcon"></IonIcon>
+                    <div ref={describeRef[1]} className="describe">Sleep</div>
                 </div>
                 <div className="functionality MAC/IP">
-                    <IonIcon icon={Icon.hardwareChip} className="functionalityIcon"></IonIcon>
+                    <IonIcon icon={Icon.hardwareChipOutline} className="functionalityIcon"></IonIcon>
                     <div ref={describeRef[2]} className="describe">MAC/IP</div>
                 </div>
                 <div className="functionality task">
@@ -46,9 +48,17 @@ export default function Menu() {
                     <IonIcon icon={Icon.logoWindows} className="functionalityIcon"></IonIcon>
                     <div ref={describeRef[6]} className="describe">Registry</div>
                 </div>
-                <div className="functionality registry">
-                    <i class="fa-solid fa-keyboard functionalityIcon"></i>
-                    <div ref={describeRef[6]} className="describe">Registry</div>
+                <div className="functionality keylogger">
+                    <i className="fa-regular fa-keyboard functionalityIcon"></i>
+                    <div ref={describeRef[7]} className="describe">Keylogger</div>
+                </div>
+                <div className="functionality terminate">
+                    <IonIcon icon={Icon.leafOutline} className="functionalityIcon"></IonIcon>
+                    <div ref={describeRef[8]} className="describe">Terminate</div>
+                </div>
+                <div className="functionality folder">
+                    <IonIcon icon={Icon.folderOutline} className="functionalityIcon"></IonIcon>
+                    <div ref={describeRef[9]} className="describe">Folder Tree</div>
                 </div>
             </div>
         </div>
