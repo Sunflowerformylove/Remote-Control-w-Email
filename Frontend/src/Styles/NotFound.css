@@ -280,6 +280,7 @@ hr {
 /*--------------------------------------------FrameWork------------------------*/
 .link-style {
   text-decoration: none;
+  max-height: 20px;
 }
 .button-86 {
   margin-left: 20px;
