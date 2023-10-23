@@ -1,20 +1,14 @@
 import os
 
 
-sec = 300  # 5 minutes
-
-
-def shutdowm():
-    os.system("shutdown -s -t {sec}")
+def shutdown(sec=0):
+    os.system("shutdown /s /t " + str(sec) + " /f")
     return "shutdown"
 
 
-def restart():
-    os.system("shutdown -r -t {sec}")
+def restart(sec=0):
+    os.system("shutdown /r /t " + str(sec) + " /f")
     return "restart"
 
-# sleep mode
-
-
-def sleep():
-    os.system("shutdown -h -t {sec}")
+def sleep(sec=0):
+    os.system("shutdown /h /t " + str(sec) + " /f")
