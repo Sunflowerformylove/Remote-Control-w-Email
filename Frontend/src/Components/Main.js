@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Menu from "./Menu";
 import "../Styles/Main.css";
 import Loading from './Loading';
+import Mail from "./Mail";
 
 export default function Main() {
     const [loading, setLoading] = useState(true);
@@ -24,6 +25,7 @@ export default function Main() {
             ) : (
                 <div className="mainContainer">
                     <Menu></Menu>
+                    <Mail></Mail>
                 </div>
 
             )}
