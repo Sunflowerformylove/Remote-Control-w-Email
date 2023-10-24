@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { IonIcon } from "@ionic/react";
 import * as Icon from "ionicons/icons";
 import "../Styles/Menu.css"
@@ -14,8 +14,13 @@ export default function Menu() {
             element.current.classList.toggle("extended");
         })
     }
+
+    function keyExtendMenu(event){
+        // if(event.key ==)
+    }
+
     return (<>
-        <div ref={menuRef} className="menuContainer">
+        <div onKeyDownCapture={} ref={menuRef} className="menuContainer">
             <div onClick={extendMenu} className="panOut">
                 <IonIcon icon={Icon.caretForwardOutline} className="panOutIcon"></IonIcon>
             </div>

@@ -10,7 +10,7 @@ export default function Welcome(props) {
         // Simulate a 1-second delay
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 3000);
+        }, 2000);
 
         // Clear the timeout if the component is unmounted
         return () => clearTimeout(timer);

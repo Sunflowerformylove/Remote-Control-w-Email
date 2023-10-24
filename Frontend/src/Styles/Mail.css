@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 70vh;
+    height: 98vh;
     width: 50vw;
     margin-left: auto;
     border: 4px solid #ccc;
@@ -128,4 +128,76 @@
     font-family: "Poppins", sans-serif;
     font-weight: 500;
     margin-left: 1%;
+}
+
+.mailContentContainer{
+    width: 90%;
+    height: 65%;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mailContent{
+    font-size: 1.6rem;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    word-wrap: break-word;
+    width: 96%;
+    height: 96%;
+    outline: none;
+    border: none;
+    resize: none;
+    text-align: justify;
+    overflow-y: scroll;
+}
+
+.mailContent::-webkit-scrollbar {
+    display: none;
+}
+
+.sendButton{
+    width: 8rem;
+    height: 3rem;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    cursor: pointer;
+}
+
+.sendButton:hover{
+    background-color: #ccc;
+}
+
+.sendBtnText{
+    width: 70%;
+    height: 100%;
+    text-align: center;
+    line-height: 3rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    user-select: none;
+}
+
+.sendButton:hover > .sendBtnText{
+    color: #333;
+}
+
+.sendIcon{
+    width: 30%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    user-select: none;
+}
+
+.sendButton:hover > .sendIcon{
+    color:#333;
 }
