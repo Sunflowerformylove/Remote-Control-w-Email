@@ -201,3 +201,10 @@
 .sendButton:hover > .sendIcon{
     color:#333;
 }
+
+.mailContent > div{
+    font-size: 1.6rem;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    word-wrap: break-word;
+}
