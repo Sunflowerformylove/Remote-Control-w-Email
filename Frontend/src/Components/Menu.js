@@ -3,7 +3,7 @@ import { IonIcon } from "@ionic/react";
 import * as Icon from "ionicons/icons";
 import "../Styles/Menu.css"
 
-export default function Menu() {
+export default function Menu(props) {
     const menuRef = useRef(null);
     const describeRef = [useRef(null), useRef(null), useRef(null), useRef(null),
     useRef(null), useRef(null), useRef(null), useRef(null),
@@ -15,12 +15,8 @@ export default function Menu() {
         })
     }
 
-    function keyExtendMenu(event){
-        // if(event.key ==)
-    }
-
     return (<>
-        <div onKeyDownCapture={} ref={menuRef} className="menuContainer">
+        <div ref={menuRef} className="menuContainer">
             <div onClick={extendMenu} className="panOut">
                 <IonIcon icon={Icon.caretForwardOutline} className="panOutIcon"></IonIcon>
             </div>

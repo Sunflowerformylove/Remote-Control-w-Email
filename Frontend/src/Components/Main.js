@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import Menu from "./Menu";
 import "../Styles/Main.css";
 import Loading from './Loading';
+import ParticlePlayground from "./ParticlePlayground";
 import Mail from "./Mail";
 
-export default function Main() {
+export default function Main(props) {
     const [loading, setLoading] = useState(true);
+    const [extendMenu, setExtendMenu] = useState(false);
 
     useEffect(() => {
         // Simulate a 1-second delay
@@ -24,7 +25,8 @@ export default function Main() {
                 <Loading />
             ) : (
                 <div className="mainContainer">
-                    <Menu></Menu>
+                    <Menu extendMenu = {extendMenu}></Menu>
+                    {/* <ParticlePlayground></ParticlePlayground> */}
                     <Mail></Mail>
                 </div>
 
