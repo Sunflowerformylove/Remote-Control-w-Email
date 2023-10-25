@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Menu from "./Menu";
 import "../Styles/Main.css";
 import Loading from './Loading';
-import ParticlePlayground from "./ParticlePlayground";
+// import ParticlePlayground from "./ParticlePlayground";
 import Mail from "./Mail";
 
 export default function Main(props) {
@@ -25,7 +25,7 @@ export default function Main(props) {
                 <Loading />
             ) : (
                 <div className="mainContainer">
-                    <Menu extendMenu = {extendMenu}></Menu>
+                    <Menu extendMenu={extendMenu}></Menu>
                     {/* <ParticlePlayground></ParticlePlayground> */}
                     <Mail></Mail>
                 </div>
