@@ -7,7 +7,7 @@ export default function Menu(props) {
     const menuRef = useRef(null);
     const describeRef = [useRef(null), useRef(null), useRef(null), useRef(null),
     useRef(null), useRef(null), useRef(null), useRef(null),
-    useRef(null), useRef(null)]
+    useRef(null)]
     function extendMenu() {
         menuRef.current.classList.toggle("extended");
         describeRef.forEach(element => {
@@ -45,21 +45,17 @@ export default function Menu(props) {
                     <IonIcon icon={Icon.apertureOutline} className="functionalityIcon"></IonIcon>
                     <div ref={describeRef[5]} className="describe">Screenshot</div>
                 </div>
-                <div className="functionality registry">
-                    <IonIcon icon={Icon.logoWindows} className="functionalityIcon"></IonIcon>
-                    <div ref={describeRef[6]} className="describe">Registry</div>
-                </div>
                 <div className="functionality keylogger">
                     <i className="fa-regular fa-keyboard functionalityIcon"></i>
-                    <div ref={describeRef[7]} className="describe">Keylogger</div>
+                    <div ref={describeRef[6]} className="describe">Keylogger</div>
                 </div>
                 <div className="functionality terminate">
                     <IonIcon icon={Icon.leafOutline} className="functionalityIcon"></IonIcon>
-                    <div ref={describeRef[8]} className="describe">Terminate</div>
+                    <div ref={describeRef[7]} className="describe">Terminate</div>
                 </div>
                 <div className="functionality folder">
                     <IonIcon icon={Icon.folderOutline} className="functionalityIcon"></IonIcon>
-                    <div ref={describeRef[9]} className="describe">Folder Tree</div>
+                    <div ref={describeRef[8]} className="describe">Folder Tree</div>
                 </div>
             </div>
         </div>
