@@ -7,7 +7,7 @@ import Mail from "./Mail";
 
 export default function Main(props) {
     const [loading, setLoading] = useState(true);
-    const [extendMenu, setExtendMenu] = useState(false);
+    const [chosenFunctionality, setChosenFunctionality] = useState(0);
 
     useEffect(() => {
         // Simulate a 1-second delay
@@ -19,15 +19,16 @@ export default function Main(props) {
         return () => clearTimeout(timer);
     }, []);
 
+
     return (
         <>
             {loading ? (
                 <Loading />
             ) : (
                 <div className="mainContainer">
-                    <Menu extendMenu={extendMenu}></Menu>
+                    <Menu chosenFunctionality={chosenFunctionality} setChosenFunctionality={setChosenFunctionality}></Menu>
                     {/* <ParticlePlayground></ParticlePlayground> */}
-                    <Mail></Mail>
+                    <Mail chosenFunctionality={chosenFunctionality} setChosenFunctionality={setChosenFunctionality}></Mail>
                 </div>
 
             )}
