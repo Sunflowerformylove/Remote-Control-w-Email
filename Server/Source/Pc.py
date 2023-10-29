@@ -1,5 +1,5 @@
 import os
-
+import time
 
 def shutdown(sec=0):
     os.system("shutdown /s /t " + str(sec) + " /f")
@@ -11,4 +11,5 @@ def restart(sec=0):
     return "restart"
 
 def sleep(sec=0):
-    os.system("shutdown /h /t " + str(sec) + " /f")
+    time.sleep(sec)
+    os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
