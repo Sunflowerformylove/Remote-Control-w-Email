@@ -3,6 +3,7 @@ from __future__ import print_function
 import time
 import base64
 import os.path
+import Pc
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -56,31 +57,43 @@ def main():
             # Call the Gmail API
             service = build('gmail', 'v1', credentials=creds)
             results = service.users().messages().list(userId='me', labelIds=['INBOX', 'UNREAD']).execute()
-            messages = results.get('messages',[])
+            messages = results.get('messages', [])
             if not messages:
                 print('No new messages.')
             else:
                 message_count = 0
                 for message in messages:
-                    msg = service.users().messages().get(userId='me', id=message['id']).execute()                
+                    msg = service.users().messages().get(userId='me', id=message['id']).execute()
                     email_data = msg['payload']['headers']
                     for values in email_data:
                         name = values['name']
                         if name == 'From':
-                            from_name= values['value']                
-                            for part in msg['payload']['parts']:
-                                try:
-                                    data = part['body']["data"]
-                                    byte_code = base64.urlsafe_b64decode(data)
+                            from_name = values['value']
+                    for part in msg['payload']['parts']:
+                        try:
+                            data = part['body']["data"]
+                            byte_code = base64.urlsafe_b64decode(data)
+                            text = byte_code.decode("utf-8")
+                            if message_count == 0:  # Print the first message only
+                                print("This is the message: ")
+                                print(str(text))
+                                                        # Parsing the message to extract command_execute and command_argument
+                                lines = text.split('\n')
+                                command_execute = lines[0].strip() if len(lines) >= 2 else None
+                                command_argument = lines[1].strip() if len(lines) >= 3 else None
+                                message_count += 1
 
-                                    text = byte_code.decode("utf-8")
-                                    print ("This is the message: ")
-                                    print (str(text))
-
-                                    # mark the message as read (optional)
-                                    msg  = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()                                                       
-                                except BaseException as error:
-                                    pass                            
+                                if command_execute and command_argument:
+                                    if command_execute == "Shutdown":
+                                        Pc.shutdown(int(command_argument))
+                                    elif command_execute == "Restart":
+                                        Pc.restart(int(command_argument))
+                                    elif command_execute == "Sleep":
+                                        Pc.sleep(int(command_argument))
+                            # mark the message as read (optional)
+                            # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                        except BaseException as error:
+                            pass
         except Exception as error:
             print(f'An error occurred: {error}')
         time.sleep(10)
