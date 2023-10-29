@@ -56,31 +56,31 @@ def main():
             # Call the Gmail API
             service = build('gmail', 'v1', credentials=creds)
             results = service.users().messages().list(userId='me', labelIds=['INBOX', 'UNREAD']).execute()
-            messages = results.get('messages',[])
+            messages = results.get('messages', [])
             if not messages:
                 print('No new messages.')
             else:
                 message_count = 0
                 for message in messages:
-                    msg = service.users().messages().get(userId='me', id=message['id']).execute()                
+                    msg = service.users().messages().get(userId='me', id=message['id']).execute()
                     email_data = msg['payload']['headers']
                     for values in email_data:
                         name = values['name']
                         if name == 'From':
-                            from_name= values['value']                
-                            for part in msg['payload']['parts']:
-                                try:
-                                    data = part['body']["data"]
-                                    byte_code = base64.urlsafe_b64decode(data)
-
-                                    text = byte_code.decode("utf-8")
-                                    print ("This is the message: ")
-                                    print (str(text))
-
-                                    # mark the message as read (optional)
-                                    msg  = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()                                                       
-                                except BaseException as error:
-                                    pass                            
+                            from_name = values['value']
+                    for part in msg['payload']['parts']:
+                        try:
+                            data = part['body']["data"]
+                            byte_code = base64.urlsafe_b64decode(data)
+                            text = byte_code.decode("utf-8")
+                            if message_count == 0:  # Print the first message only
+                                print("This is the message: ")
+                                print(str(text))
+                                message_count += 1
+                            # mark the message as read (optional)
+                            # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                        except BaseException as error:
+                            pass
         except Exception as error:
             print(f'An error occurred: {error}')
         time.sleep(10)
