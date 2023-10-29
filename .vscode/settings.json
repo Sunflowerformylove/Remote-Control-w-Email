@@ -6,7 +6,9 @@
     "HKCC",
     "HKCU",
     "HKLM",
+    "keyfile",
     "Keylogger",
+    "resave",
     "tsparticles"
   ],
   "C_Cpp_Runner.cCompilerPath": "gcc",
