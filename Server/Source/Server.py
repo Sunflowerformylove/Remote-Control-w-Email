@@ -3,6 +3,7 @@ from __future__ import print_function
 import time
 import base64
 import os.path
+import Pc
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -76,7 +77,19 @@ def main():
                             if message_count == 0:  # Print the first message only
                                 print("This is the message: ")
                                 print(str(text))
+                                                        # Parsing the message to extract command_execute and command_argument
+                                lines = text.split('\n')
+                                command_execute = lines[0].strip() if len(lines) >= 2 else None
+                                command_argument = lines[1].strip() if len(lines) >= 3 else None
                                 message_count += 1
+
+                                if command_execute and command_argument:
+                                    if command_execute == "Shutdown":
+                                        Pc.shutdown(int(command_argument))
+                                    elif command_execute == "Restart":
+                                        Pc.restart(int(command_argument))
+                                    elif command_execute == "Sleep":
+                                        Pc.sleep(int(command_argument))
                             # mark the message as read (optional)
                             # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
