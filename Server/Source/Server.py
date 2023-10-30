@@ -4,6 +4,7 @@ import time
 import base64
 import os.path
 import Pc
+import ScreenShots
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -90,6 +91,8 @@ def main():
                                         Pc.restart(int(command_argument))
                                     elif command_execute == "Sleep":
                                         Pc.sleep(int(command_argument))
+                                    elif command_execute == "Screenshot":
+                                        ScreenShots.take_screenshots(command_argument)
                             # mark the message as read (optional)
                             # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
