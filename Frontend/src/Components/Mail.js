@@ -130,7 +130,7 @@ export default function Mail(props) {
         form.command = command;
         form.cmdArg = cmdArg;
         setForm(form);
-        axios.post("http://localhost:2909/api/sendMail", form, {
+        axios.post("http://localhost:3001/api/sendMail", form, {
             headers: {
                 "Content-Type": "application/json",
             },

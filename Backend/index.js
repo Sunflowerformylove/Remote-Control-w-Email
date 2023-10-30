@@ -8,86 +8,69 @@ const MailComposer = require('nodemailer/lib/mail-composer');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+const { authenticate } = require('@google-cloud/local-auth');
+const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
+const OAuth2Client = google.auth.OAuth2Client;
 const fs = require('fs');
 const session = require('express-session');
 const SALT_ROUNDS = 15;
 const app = express();
 const PORT = 3001;
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+const SCOPES = ['https://mail.google.com/']
 const TOKEN_PATH = path.join(__dirname, 'Token/token.json');
 const CREDENTIALS_PATH = path.join(__dirname, 'Token/credentials.json');
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-/**
- * Reads previously authorized credentials from the save file.
- *
- * return {Promise<OAuth2Client|null>}
- */
+const GMAIL_CLIENT_ID = JSON.parse(fs.readFileSync(CREDENTIALS_PATH)).web.client_id;
+const GMAIL_CLIENT_SECRET = JSON.parse(fs.readFileSync(CREDENTIALS_PATH)).web.client_secret;
+const GMAIL_REFRESH_TOKEN = "1//04FLNfW1nEh4wCgYIARAAGAQSNwF-L9Ir9bBpoj60Bgjl9ozBoaCVjV2oWVbRHU7WuLqZnZAHa-64MHMrshDcT5NG32nlakwa7hg"
 
-async function loadSaveCredentialIfExist(){
-    try{
+async function loadSavedCredentialsIfExist() {
+    try {
         const content = await fs.promises.readFile(TOKEN_PATH);
         const credentials = JSON.parse(content);
-        return google.auth.OAuth2.fromJSON(credentials);
-    }
-    catch(err){
-        if(err.code === 'ENOENT'){
-            return null;
-        }
+        return google.auth.fromJSON(credentials);
+    } catch (err) {
+        return null;
     }
 }
 
-async function saveCredential(client){
+async function saveCredentials(client) {
     const content = await fs.promises.readFile(CREDENTIALS_PATH);
     const keys = JSON.parse(content);
-    const key = keys.installed || keys.web;
+    const key = keys.web;
     const payload = JSON.stringify({
         type: 'authorized_user',
         client_id: key.client_id,
         client_secret: key.client_secret,
         refresh_token: client.credentials.refresh_token,
-    })
-    await fs.promises.writeFile(TOKEN_PATH, payload, {mode: 0o600});
+    });
+    await fs.promises.writeFile(TOKEN_PATH, payload);
 }
 
-async function authorize(){
-    let client = await loadSaveCredentialIfExist();
-    if(client){
+async function authorize() {
+    let client = await loadSavedCredentialsIfExist();
+    if (client) {
         return client;
     }
     client = await authenticate({
         scopes: SCOPES,
         keyfilePath: CREDENTIALS_PATH,
     });
-    if(client.credentials){
-        await saveCredential(client);
+    if (client.credentials) {
+        await saveCredentials(client);
     }
     return client;
 }
 
-async function listLabels(auth){
-    const gmail = google.gmail({version: 'v1', auth});
-    const res = await gmail.users.labels.list({
-        userId: 'me',
-    });
-    const labels = res.data.labels;
-    if(!labels || labels.length === 0){
-        console.log('No labels found.');
-        return;
-    }
-    console.log('Labels:');
-    labels.forEach((label) => {
-        console.log(`-${label.name}`)
-    });
-}
+// Create O2Auth2 client with the given credentials, and then execute the given callback function.
+const userOauth2Client = new OAuth2(
+    GMAIL_CLIENT_ID,
+    GMAIL_CLIENT_SECRET,
+);
 
-async function createMail(option){
-    const mailComposer = new MailComposer(option);
-}
+userOauth2Client.setCredentials({
+    refresh_token: GMAIL_REFRESH_TOKEN
+});
 
 //middleware
 app.use(cors({
@@ -111,46 +94,69 @@ app.use(session({
 }))
 
 app.listen(PORT, (err) => {
-    authorize();
     if (err) console.error(err.message);
     console.log(`Server is running on PORT ${PORT}`)
 });
 
 app.post('/api/sendMail', async (request, response) => {
-    const token = await JSON.parse(fs.promises.readFile(TOKEN_PATH));
-    const credentials = await JSON.parse(fs.promises.readFile(CREDENTIALS_PATH));
-    const oauth2Client = new OAuth2(
-        token.client_id,
-        token.client_secret,
-        'http://localhost:3000/email-verification'
-    );
-    oauth2Client.setCredentials({
-        refresh_token: token.refresh_token
-    });
-    const accessToken = await oauth2Client.getAccessToken();
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            type: 'OAuth2',
-            user: request.body.sender,
-            clientId: token.client_id,
-            clientSecret: token.client_secret,
-            refreshToken: token.refresh_token,
-            accessToken: accessToken,
+
+    // try {
+    //     const email = request.body.sender;
+    //     const subject = request.body.subject;
+    //     const cmdArg = request.body.cmdArg;
+    //     const command = request.body.command;
+    //     const ACCESS_TOKEN = await userOauth2Client.getAccessToken();
+    //     const TOKEN = ACCESS_TOKEN?.token;
+    //     console.log(command, cmdArg, subject, email);
+    //     const transporter = nodemailer.createTransport({
+    //         service: 'gmail',
+    //         auth: {
+    //             type: 'OAuth2',
+    //             user: email,
+    //             clientId: GMAIL_CLIENT_ID,
+    //             clientSecret: GMAIL_CLIENT_SECRET,
+    //             refreshToken: GMAIL_REFRESH_TOKEN,
+    //             accessToken: TOKEN,
+    //         },
+    //     });
+    //     const mailOptions = {
+    //         from: "atwohohoho@gmail.com",
+    //         to: email,
+    //         subject: subject,
+    //         html: `<div>${command}</div>
+    //             <br>
+    //             <div>${cmdArg}</div>
+    //             <br>
+    //         `,
+    //         priority: 'high',
+    //     };
+    //     transporter.sendMail(mailOptions, (err, info) => {
+    //         if (err) console.log(err.message);
+    //         else console.log(info);
+    //     });
+    //     response.status(200).json({ message: "Email sent successfully", status: 200 });
+    // }
+    // catch {
+    //     console.log("Error sending email");
+    //     response.status(500).json({ message: "Error sending email", status: 500 });
+    // }
+    const gmail = google.gmail({ version: 'v1', auth: userOauth2Client });
+    const email = request.body.sender;
+    const subject = request.body.subject;
+    const cmdArg = request.body.cmdArg;
+    const command = request.body.command;
+    const res = await gmail.users.messages.send({
+        userId: 'me',
+        requestBody: {
+            raw: Buffer.from(
+                `From: ${email}\n` + 
+                `To: atwohohoho@gmail.com\n` +
+                `Subject: ${subject}\n\n` +
+                `${command}\n` +
+                `${cmdArg}`
+            ).toString('base64')
         }
     });
-    const message = {
-        from: request.body.sender,
-        to: 'atwohohoho@gmail.com',
-        subject: request.body.subject,
-        text: 'test',
-        html: '<div>test</div>'
-    };
-    transporter.sendMail(message, (err, info) => {
-        if(err) console.log(err);
-        else console.log(info);
-    });
-    response.end();
+    console.log(res.data.id);
+    response.status(200).json({ message: "Email sent successfully", status: 200 });
 });
-
-// Path: Backend/server.js
