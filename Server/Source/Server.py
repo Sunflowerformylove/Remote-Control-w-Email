@@ -78,6 +78,7 @@ def main():
                     for values in email_data:
                         name = values['name']
                         if name == 'From':
+                            print(f"From: {values['value']}") #print the sender address
                             from_name = values['value']
                     for part in msg['payload']['parts']:
                         try:
@@ -119,7 +120,7 @@ def main():
                                                 ipv4, ipv6 = MAC_IP.get_ip_addresses()
                                                 print(f"IPv6 Address: {ipv6}")
                             # mark the message as read (optional)
-                            # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                            msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
                             pass
         except Exception as error:
