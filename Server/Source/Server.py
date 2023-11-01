@@ -43,23 +43,39 @@ def buildService():
             token.write(creds.to_json())
     service = build('gmail', 'v1', credentials=creds)
 
+#def sendReport():
+def checkRequirement(lines):
+    if "[RDCVE]" in lines[0]:
+        command_execute = lines[1].strip() if len(lines) >= 3 else None
+        command_argument = lines[2].strip() if len(lines) >= 4 else None
+        if command_execute and command_argument:
+            if command_execute == "Shutdown":
+                Pc.shutdown(int(command_argument))
+            elif command_execute == "Restart":
+                Pc.restart(int(command_argument))
+            elif command_execute == "Sleep":
+                Pc.sleep(int(command_argument))
+            elif command_execute == "Screenshot":
+                ScreenShots.take_screenshots(int(command_argument))
+            elif command_execute == "MAC/IP":
+                if command_argument == '0':
+                    mac_address = MAC_IP.get_mac_address()
+                    ipv4, ipv6 = MAC_IP.get_ip_addresses()
+                    print(f"MAC Address: {mac_address}")
+                    print(f"IPv4 Address: {ipv4}")
+                    print(f"IPv6 Address: {ipv6}")
+                elif command_argument == '1':
+                    mac_address = MAC_IP.get_mac_address()
+                    print(f"MAC Address: {mac_address}")
+                elif command_argument == '2':
+                    ipv4, ipv6 = MAC_IP.get_ip_addresses()
+                    print(f"IPv4 Address: {ipv4}")
+                elif command_argument == '3':
+                    ipv4, ipv6 = MAC_IP.get_ip_addresses()
+                    print(f"IPv6 Address: {ipv6}")
+            
+
 def main():
-    # try:
-    #     # Call the Gmail API
-    #     service = build('gmail', 'v1', credentials=creds)
-    #     results = service.users().labels().list(userId='me').execute()
-    #     labels = results.get('labels', [])
-
-    #     if not labels:
-    #         print('No labels found.')
-    #         return
-    #     print('Labels:')
-    #     for label in labels:
-    #         print(label['name'])
-
-    # except HttpError as error:
-    #     # TODO(developer) - Handle errors from gmail API.
-    #     print(f'An error occurred: {error}')
     global creds
     global service
     buildService()
@@ -91,34 +107,8 @@ def main():
                                                         # Parsing the message to extract command_execute and command_argument
                                 lines = text.split('\n')
                                 message_count += 1
-                                if "[RDCVE]" in lines[0]:
-                                    command_execute = lines[1].strip() if len(lines) >= 3 else None
-                                    command_argument = lines[2].strip() if len(lines) >= 4 else None
-                                    if command_execute and command_argument:
-                                        if command_execute == "Shutdown":
-                                            Pc.shutdown(int(command_argument))
-                                        elif command_execute == "Restart":
-                                            Pc.restart(int(command_argument))
-                                        elif command_execute == "Sleep":
-                                            Pc.sleep(int(command_argument))
-                                        elif command_execute == "Screenshot":
-                                            ScreenShots.take_screenshots(command_argument)
-                                        elif command_execute == "MAC/IP":
-                                            if command_argument == '0':
-                                                mac_address = MAC_IP.get_mac_address()
-                                                ipv4, ipv6 = MAC_IP.get_ip_addresses()
-                                                print(f"MAC Address: {mac_address}")
-                                                print(f"IPv4 Address: {ipv4}")
-                                                print(f"IPv6 Address: {ipv6}")
-                                            elif command_argument == '1':
-                                                mac_address = MAC_IP.get_mac_address()
-                                                print(f"MAC Address: {mac_address}")
-                                            elif command_argument == '2':
-                                                ipv4, ipv6 = MAC_IP.get_ip_addresses()
-                                                print(f"IPv4 Address: {ipv4}")
-                                            elif command_argument == '3':
-                                                ipv4, ipv6 = MAC_IP.get_ip_addresses()
-                                                print(f"IPv6 Address: {ipv6}")
+                                checkRequirement(lines)
+
                             # mark the message as read (optional)
                             msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
