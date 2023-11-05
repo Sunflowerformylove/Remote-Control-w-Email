@@ -4,8 +4,7 @@ from email.message import EmailMessage
 import google.auth
 import time
 import base64
-import mimetypes
-import os
+import re
 import os.path
 import Pc
 import ScreenShots
@@ -135,63 +134,32 @@ def checkRequirement(lines):
             except Exception as e:
                 print(f"Error writing to file: {e}")
 
-def gmail_send_email_with_attachment(recipient_email):
-    """Create and insert a draft email with attachment.
-       Print the returned draft's message and id.
-      Returns: Draft object, including draft id and message meta data.
+def sendReport(email_sender):
+    global service
+    message = MIMEMultipart()
+    message['to'] = email_sender
+    message['subject'] = '[RDCVE] - Report'
 
-      Load pre-authorized user credentials from the environment.
-      TODO(developer) - See https://developers.google.com/identity
-      for guides on implementing OAuth2 for the application.
-    """
-    # creds, _ = google.auth.default()
+    body = 'Requirement has been recorded.\nPlease check the attached file for more details.'
+    message.attach(MIMEText(body, 'plain'))
 
     try:
-        # create gmail api client
-        mime_message = EmailMessage()
+        with open('report.txt', 'r') as file:
+            attachment = MIMEBase('application', 'octet-stream')
+            attachment.set_payload(file.read())
+            encoders.encode_base64(attachment)
+            attachment.add_header('Content-Disposition', 'attachment', filename='report.txt')
+            message.attach(attachment)
+    except Exception as e:
+        print(f"Error attaching file: {e}")
+        return
 
-        # headers
-        mime_message['To'] = recipient_email
-        mime_message['From'] = 'atwohohoho@gmail.com'
-        mime_message['Subject'] = "[RDCVE] Report"
-
-        # text
-        mime_message.set_content(
-            'Requirement has been recorded.\n'
-            'Please check the attached file for more details.'
-        )
-
-        # attachment
-        attachment_filename = 'report.txt'
-        # guessing the MIME type
-        type_subtype, _ = mimetypes.guess_type(attachment_filename)
-        maintype, subtype = type_subtype.split('/')
-
-        with open(attachment_filename, 'rb') as fp:
-            attachment_data = fp.read()
-        mime_message.add_attachment(attachment_data, maintype, subtype)
-
-        encoded_message = base64.urlsafe_b64encode(mime_message.as_bytes()).decode()
-
-        create_message = {
-            'message': {
-                'raw': encoded_message
-            }
-        }
-        # pylint: disable=E1101
-        # send_message = (service.users().messages().send(userId="me",
-        #                                                 body=create_message)\
-        #             .execute())
-        # print(F'Message Id: {send_message["id"]}')
-        
-        draft = service.users().drafts().create(userId="me",
-                                                body=create_message)\
-            .execute()
-        print(F'Draft id: {draft["id"]}\nDraft message: {draft["message"]}')
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
+    try:
+        message = service.users().messages().send(userId='me', body={'raw': raw_message}).execute()
+        print('Report sent successfully!')
     except HttpError as error:
-        print(F'An error occurred: {error}')
-        draft = None
-    return draft
+        print(f'An error occurred while sending the report: {error}')
 
 def main():
     global creds
@@ -213,7 +181,7 @@ def main():
                         name = values['name']
                         if name == 'From':
                             print(f"From: {values['value']}") #print the sender address
-                            from_name = re.search(r'<([^>]+)>', values['value']).group(1)
+                            email_sender = re.search(r'<([^>]+)>', values['value']).group(1)
                     for part in msg['payload']['parts']:
                         try:
                             data = part['body']["data"]
@@ -226,8 +194,7 @@ def main():
                                 lines = text.split('\n')
                                 message_count += 1
                                 checkRequirement(lines)
-                                print(f"HELLO\n")
-                                print (gmail_send_email_with_attachment(from_name))
+                                sendReport(email_sender)
                             # mark the message as read (optional)
                             # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
