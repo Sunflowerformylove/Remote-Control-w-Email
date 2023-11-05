@@ -27,6 +27,3 @@ def getSystemInfo():
                     'CPUCurrent': CPUCurrent, 'DiskPartitions': DiskPartitions, 'DiskTotal': DiskTotal,
                     'DiskCurrent': DiskCurrent, 'DiskUsed': DiskUsed}
     return resultDict
-
-for key, value in getSystemInfo().items():
-    print(key, value)

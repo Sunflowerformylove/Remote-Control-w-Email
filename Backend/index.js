@@ -29,7 +29,7 @@ userOauth2Client.setCredentials({
     refresh_token: GMAIL_REFRESH_TOKEN
 });
 
-async function getAuthClient(){
+async function getAuthClient() {
     const auth = await authenticate({
         keyfilePath: CREDENTIALS_PATH,
         scopes: SCOPES,
@@ -37,7 +37,7 @@ async function getAuthClient(){
     return auth;
 }
 
-async function getEmailAddress(auth){
+async function getEmailAddress(auth) {
     const gmail = google.gmail({ version: 'v1', auth });
     const res = await gmail.users.getProfile({
         userId: 'me',
@@ -78,11 +78,45 @@ app.post('/api/sendMail', async (request, response) => {
     const subject = request.body.subject;
     const cmdArg = request.body.cmdArg;
     const command = request.body.command;
-    console.log(auth.email);
-    const res = await gmail.users.messages.send({
-        userId: 'me',
-        requestBody: {
-            raw: Buffer.from(`From: ${auth.email}\nTo: ${email}\nSubject: ${subject}\n\n[RDCVE]\n${command}\n${cmdArg}`).toString('base64')
+    // if (fs.existsSync(path.join(__dirname, `Token/${request.body.email}.json`))) {
+    //     try {
+    //         const content = fs.readFileSync(`${request.body.email}.json`);
+    //         const credential = JSON.parse(content);
+    //         return google.auth.fromJSON(credential);
+    //     } catch (err) {
+    //         response.json({ message: "Cannot validate user!", status: 401 })
+    //     }
+    // }
+    // else {
+    //     try {
+    //         auth = await getAuthClient();
+    //         const content = fs.readFileSync(CREDENTIALS_PATH);
+    //         const keys = JSON.parse(content);
+    //         const key = keys.web;
+    //         const payload = JSON.stringify({
+    //             type: 'authorized_user',
+    //             client_id: key.client_id,
+    //             client_secret: key.client_secret,
+    //             refresh_token: GMAIL_REFRESH_TOKEN,
+    //         });
+    //         fs.writeFileSync(path.join(__dirname, `Token/${request.body.sender}.json`), payload);
+    //     } catch (err) {
+    //         response.json({ message: "Cannot authorize user!", status: 401 })
+    //     }
+    // }
+    // try {
+        response.end();
+        const res = await gmail.users.messages.send({
+            auth: auth,
+            userId: 'me',
+            requestBody: {
+                raw: Buffer.from(`From: ${email}\nTo: ${'atwohohoho@gmail.com'}\nSubject: ${subject}\n\n[RDCVE]\n${command}\n${cmdArg}`).toString('base64')
+            }
+        });
+        if (res.data.id) {
+            response.json({ message: "Email sent!", status: 200 });
         }
-    });
+    // } catch (err) {
+    //     response.json({ message: "Cannot send email!", status: 401 })
+    // }
 });
