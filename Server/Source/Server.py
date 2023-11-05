@@ -4,7 +4,6 @@ from email.message import EmailMessage
 import google.auth
 import time
 import base64
-import re
 import os.path
 import Pc
 import ScreenShots
