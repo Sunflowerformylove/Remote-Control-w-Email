@@ -19,6 +19,13 @@ def get_running_apps():
     running_apps_str = "\n".join(running_apps)
     return running_apps_str
 
+def terminate_process(process_id):
+    try:
+        os.kill(int(process_id), signal.SIGTERM)
+        return f"Process with ID: {process_id} has been terminated."
+    except Exception as e:
+        return f"Unable to terminate process with ID: {process_id}\nError: {str(e)}"
+
 def get_processes_with_status():
     processes_status = []
     for proc in psutil.process_iter(['pid', 'name', 'status']):
