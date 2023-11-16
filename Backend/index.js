@@ -72,40 +72,44 @@ app.listen(PORT, (err) => {
 });
 
 app.post('/api/sendMail', async (request, response) => {
-    const auth = await getAuthClient();
+    let auth;
     const gmail = google.gmail({ version: 'v1', auth: userOauth2Client });
     const email = request.body.sender;
     const subject = request.body.subject;
     const cmdArg = request.body.cmdArg;
     const command = request.body.command;
-    // if (fs.existsSync(path.join(__dirname, `Token/${request.body.email}.json`))) {
-    //     try {
-    //         const content = fs.readFileSync(`${request.body.email}.json`);
-    //         const credential = JSON.parse(content);
-    //         return google.auth.fromJSON(credential);
-    //     } catch (err) {
-    //         response.json({ message: "Cannot validate user!", status: 401 })
-    //     }
-    // }
-    // else {
-    //     try {
-    //         auth = await getAuthClient();
-    //         const content = fs.readFileSync(CREDENTIALS_PATH);
-    //         const keys = JSON.parse(content);
-    //         const key = keys.web;
-    //         const payload = JSON.stringify({
-    //             type: 'authorized_user',
-    //             client_id: key.client_id,
-    //             client_secret: key.client_secret,
-    //             refresh_token: GMAIL_REFRESH_TOKEN,
-    //         });
-    //         fs.writeFileSync(path.join(__dirname, `Token/${request.body.sender}.json`), payload);
-    //     } catch (err) {
-    //         response.json({ message: "Cannot authorize user!", status: 401 })
-    //     }
-    // }
+    if (fs.existsSync(path.join(__dirname, `Token/${request.body.sender}.json`))) {
+        console.log("Token found!");
+        try {
+            const content = fs.readFileSync(`${request.body.sender}.json`);
+            const credential = JSON.parse(content);
+            auth = new OAuth2Client(GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET);
+            auth.setCredentials(credential);
+            console.log(auth);
+        } catch (err) {
+            response.json({ message: "Cannot validate user!", status: 401 })
+        }
+    }
+    else {
+        console.log("No token found!");
+        try {
+            auth = await getAuthClient();
+            const content = fs.readFileSync(CREDENTIALS_PATH);
+            const keys = JSON.parse(content);
+            const key = keys.web;
+            const payload = JSON.stringify({
+                type: 'authorized_user',
+                client_id: key.client_id,
+                client_secret: key.client_secret,
+                refresh_token: GMAIL_REFRESH_TOKEN,
+            });
+            fs.writeFileSync(path.join(__dirname, `Token/${request.body.sender}.json`), payload);
+        } catch (err) {
+            response.json({ message: "Cannot authorize user!", status: 401 })
+        }
+    }
     // try {
-        response.end();
+        console.log(auth);
         const res = await gmail.users.messages.send({
             auth: auth,
             userId: 'me',
@@ -113,9 +117,6 @@ app.post('/api/sendMail', async (request, response) => {
                 raw: Buffer.from(`From: ${email}\nTo: ${'atwohohoho@gmail.com'}\nSubject: ${subject}\n\n[RDCVE]\n${command}\n${cmdArg}`).toString('base64')
             }
         });
-        if (res.data.id) {
-            response.json({ message: "Email sent!", status: 200 });
-        }
     // } catch (err) {
     //     response.json({ message: "Cannot send email!", status: 401 })
     // }
