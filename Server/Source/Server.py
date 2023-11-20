@@ -5,7 +5,7 @@ import google.auth
 import time
 import base64
 import os.path
-import Pc
+import PC
 import ScreenShots
 import MAC_IP
 import SystemInfo
