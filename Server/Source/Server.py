@@ -55,8 +55,8 @@ def buildService():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'Server\\Assets\\JSON\\credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(os.getcwd() +
+                '/Assets/JSON/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('../../token.json', 'w') as token:
@@ -72,13 +72,13 @@ def checkRequirement(lines):
         if command_execute and command_argument:
             if command_execute == "Shutdown":
                 report = f"Shut down in {command_argument} seconds."
-                Pc.shutdown(int(command_argument))
+                PC.shutdown(int(command_argument))
             elif command_execute == "Restart":
                 report = f"Restart in {command_argument} seconds."
-                Pc.restart(int(command_argument))
+                PC.restart(int(command_argument))
             elif command_execute == "Sleep":
                 report = f"Sleep in {command_argument} seconds."
-                Pc.sleep(int(command_argument))
+                PC.sleep(int(command_argument))
             elif command_execute == "Screenshot":
                 report = ScreenShots.take_screenshots(int(command_argument))
             elif command_execute == "MAC/IP":

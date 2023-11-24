@@ -13,25 +13,25 @@ export default function Mail(props) {
     const [command, setCommand] = useState("");
     const [mailCommand, setMailCommand] = useState("");
     const [description, setDescription] = useState("");
-    const [password, setPassword] = useState("");
     const [form, setForm] = useState({});
     const [PID, setPID] = useState(0);
     const [folderName, setFolderName] = useState("");
     const [task_number, setTask_number] = useState(0);
     const [second, setSecond] = useState(0);
     const [termCommand, setTermCommand] = useState("");
-    const [eye, setEye] = useState(Icon.eyeOff);
     const [cmdArg, setCmdArg] = useState("");
-    const passwordRef = useRef(null);
-    const eyeRef = useRef(null);
     const mailRef = useRef(null);
     const cmdArgRef = useRef(null);
-    const sendRef = useRef(null);
-
+    const copyContentRef = [useRef(null), useRef(null), useRef(null)];
     function updateTime() {
         setInterval(() => {
             setTime(new Date().toLocaleString());
         }, 1000);
+    }
+
+    async function copyContent(index) {
+        await navigator.clipboard.writeText(copyContentRef[index].current.innerText);
+        toastSuccess("Copied to clipboard");
     }
 
     function setMailContent(index, command, time = 0, task_number = 0, PID = 0, folderName = "C:/Users/dodin/Desktop") {
@@ -113,14 +113,8 @@ export default function Mail(props) {
         }
     }
 
-    function passwordVisibility() {
-        passwordRef.current.type = passwordRef.current.type === "password" ? "text" : "password";
-        setEye(eye === Icon.eyeOff ? Icon.eye : Icon.eyeOff);
-    }
-
     function setFormContent() {
         setMail(mailRef.current.value);
-        setPassword(passwordRef.current.value);
     }
 
     function setCmdArgContent() {
@@ -128,14 +122,11 @@ export default function Mail(props) {
     }
 
     function sendEmail() {
-        console.log(mail);
-        console.log(password);
-        if (password.length === 0 || mail.length === 0) {
-            toastError("Error: Email or password is empty");
+        if (mail.length === 0) {
+            toastError("Error: Email is empty");
             return;
         }
         form.sender = mail;
-        form.password = password;
         form.subject = subject;
         form.command = mailCommand;
         form.cmdArg = cmdArg;
@@ -147,7 +138,6 @@ export default function Mail(props) {
         }).then((res) => {
             toastSuccess("Email sent successfully");
         }).catch((err) => {
-            console.log(err);
             toastError("Error: Email has not been sent");
         })
     }
@@ -256,25 +246,20 @@ export default function Mail(props) {
             <div className="mail">
                 <div className="mailReceiver">
                     <div className="mailReceiverText">To: </div>
-                    <div className="receiverEmail">atwohohoho@gmail.com</div>
-                    <div className="copyButton">Copy</div>
+                    <div className="receiverEmail" ref={copyContentRef[0]}>atwohohoho@gmail.com</div>
+                    <div className="copyButton" onClick={async () => await copyContent(0)}>Copy</div>
                 </div>
                 <div className="mailSender">
                     <div onInput={setFormContent} className="mailSenderText">From: </div>
                     <input ref={mailRef} type={"text"} className="senderEmail"></input>
                 </div>
-                <div className="senderPassword">
-                    <div className="senderPasswordText">Password: </div>
-                    <input onInput={setFormContent} ref={passwordRef} type={"password"} className="senderPasswordInput"></input>
-                    <IonIcon ref={eyeRef} onClick={passwordVisibility} icon={eye} className={"passwordState"}></IonIcon>
-                </div>
                 <div className="subjectBox">
                     <div className="subjectText">Subject: </div>
-                    <div className="dynamicSubject">{subject}</div>
-                    <div className="copyButton">Copy</div>
+                    <div className="dynamicSubject" ref={copyContentRef[1]}>{subject}</div>
+                    <div className="copyButton" onClick={async () => await copyContent(1)}>Copy</div>
                 </div>
                 <div className="mailContentContainer">
-                    <div className="mailContent">
+                    <div className="mailContent" ref = {copyContentRef[2]}>
                         <div className="command">Command: {command} </div>
                         <br></br>
                         <div className="commandArgument">
@@ -286,8 +271,9 @@ export default function Mail(props) {
                         <br></br>
                         <div className="briefDescription">Description: </div>
                     </div>
+                    <div className="copyButton" onClick={async () => await copyContent(2)}>Copy</div>
                 </div>
-                <div onClick = {sendEmail} className="sendButton">
+                <div onClick={sendEmail} className="sendButton">
                     <div className="sendBtnText">Send</div>
                     <IonIcon className="sendIcon" icon={Icon.paperPlaneOutline}></IonIcon>
                 </div>
