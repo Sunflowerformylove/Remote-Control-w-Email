@@ -83,16 +83,20 @@ def checkRequirement(lines):
                 report = ScreenShots.take_screenshots(int(command_argument))
             elif command_execute == "MAC/IP":
                 if command_argument == '0':
+                    #all
                     mac_address = MAC_IP.get_mac_address()
                     ipv4, ipv6 = MAC_IP.get_ip_addresses()
                     report = f"MAC Address: {mac_address}\nIPv4 Address: {ipv4}\nIPv6 Address: {ipv6}"
                 elif command_argument == '1':
+                    #mac address
                     mac_address = MAC_IP.get_mac_address()
                     report = f"MAC Address: {mac_address}"
                 elif command_argument == '2':
+                    #get ipv4
                     ipv4, ipv6 = MAC_IP.get_ip_addresses()
                     report = f"IPv4 Address: {ipv4}"
                 elif command_argument == '3':
+                    #get ipv6
                     ipv4, ipv6 = MAC_IP.get_ip_addresses()
                     report = f"IPv6 Address: {ipv6}"
             elif command_execute == "Task Manager":
