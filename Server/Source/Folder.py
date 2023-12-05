@@ -10,5 +10,3 @@ def getFolderTree(directory):
         for f in files:
             tree += '{}{}\n'.format(subIndent, f)
     return tree
-
-print(getFolderTree('C:/Users/dodin/Desktop/Remote-Control-w-Email/Server/Source'))
