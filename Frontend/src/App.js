@@ -11,7 +11,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/main" element={<Main />} />
-        <Route path="*" element={<NotFound />} />
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </div>
   );

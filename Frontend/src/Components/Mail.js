@@ -4,10 +4,11 @@ import { IonIcon } from "@ionic/react";
 import * as Icon from "ionicons/icons";
 import { toastError, toastSuccess } from "./Toast";
 import axios from "axios";
+import Socket from "./Socket";
 const lodash = require("lodash");
 
 export default function Mail(props) {
-    const [mail, setMail] = useState("");
+    const [admin, setAdmin] = useState(false);
     const [time, setTime] = useState("");
     const [subject, setSubject] = useState("");
     const [command, setCommand] = useState("");
@@ -20,9 +21,20 @@ export default function Mail(props) {
     const [second, setSecond] = useState(0);
     const [termCommand, setTermCommand] = useState("");
     const [cmdArg, setCmdArg] = useState("");
-    const mailRef = useRef(null);
     const cmdArgRef = useRef(null);
     const copyContentRef = [useRef(null), useRef(null), useRef(null)];
+    const descriptionArr = [
+        "Turn off the computer after the given time in seconds",
+        "Put the computer into a dormant state after the given time in seconds",
+        "Get the MAC and IP address of the computer. 0 for All, 1 for MAC, 2 for IPv4, 3 for IPv6",
+        "Get the list of running processes with ports and PIDs. 0 for all, 1 for running, 2 for not responding, 3 for RAM, 4 for CPU",
+        "Run a command in the terminal, e.g. 'dir' or 'ls'",
+        "Take a screenshot of the computer after the given time in seconds",
+        "Get the keystrokes of the computer during the given time in seconds",
+        "Terminate a task with the given PID",
+        "Get the folder tree of the computer. The computer username is: Seapeas. e.g. 'C:/Users/Seapeas/Desktop'",
+        "Get the system info of the computer",
+    ]
     function updateTime() {
         setInterval(() => {
             setTime(new Date().toLocaleString());
@@ -35,77 +47,67 @@ export default function Mail(props) {
     }
 
     function setMailContent(index, command, time = 0, task_number = 0, PID = 0, folderName = "C:/Users/dodin/Desktop") {
+        setDescription(descriptionArr[index]);
         switch (index) {
             case 0:
                 setSubject("[RDCVE] Shutdown");
                 setCommand("Shutdown " + time);
                 setMailCommand("Shutdown");
                 setDescription("Shutdown the computer after the given time in seconds");
-                setCmdArg("0");
                 break;
             case 1:
                 setSubject("[RDCVE] Sleep");
                 setCommand("Sleep " + time);
                 setMailCommand("Sleep");
                 setDescription("Put the computer to sleep after the given time in seconds");
-                setCmdArg("0");
                 break;
             case 2:
                 setSubject("[RDCVE] MAC/IP");
                 setCommand("MAC/IP");
                 setMailCommand("MAC/IP");
                 setDescription("Get the MAC and IP address of the computer");
-                setCmdArg("0");
                 break;
             case 3:
                 setSubject("[RDCVE] Task Manager");
                 setCommand("Task Manager " + task_number); // 0 for all, 1 for running, 2 for not responding, 3 for RAM, 4 for CPU
                 setMailCommand("Task Manager");
                 setDescription("Get the list of running processes with ports and PIDs");
-                setCmdArg("0");
                 break;
             case 4:
                 setSubject("[RDCVE] Terminal");
                 setCommand("Terminal ", command);
                 setMailCommand("Terminal");
                 setDescription("Run a command in the terminal");
-                setCmdArg("");
                 break;
             case 5:
-                ;
                 setSubject("[RDCVE] Screenshot");
                 setCommand("Screenshot");
                 setMailCommand("Screenshot");
                 setDescription("Take a screenshot of the computer");
-                setCmdArg("0");
                 break;
             case 6:
                 setSubject("[RDCVE] Keylogger");
                 setCommand("Keylogger");
                 setMailCommand("Keylogger");
                 setDescription("Get the keystrokes of the computer");
-                setCmdArg("0");
                 break;
             case 7:
                 setSubject("[RDCVE] Terminate");
                 setCommand("Terminate " + PID);
                 setMailCommand("Terminate");
                 setDescription("Terminate the a task with the given PID");
-                setCmdArg("0");
                 break;
             case 8:
                 setSubject("[RDCVE] Folder Tree");
                 setCommand("Folder Tree " + folderName);
                 setMailCommand("Folder Tree");
                 setDescription("Get the folder tree of the computer. The computer username is: dodin");
-                setCmdArg("C:/Users/dodin/Desktop");
                 break;
             case 9:
                 setSubject("[RDCVE] System Info");
                 setCommand("System Info");
                 setMailCommand("System Info");
                 setDescription("Get the system info of the computer.");
-                setCmdArg("0");
                 break;
             default:
                 toastError("Error: Invalid command")
@@ -113,20 +115,19 @@ export default function Mail(props) {
         }
     }
 
-    function setFormContent() {
-        setMail(mailRef.current.value);
-    }
-
     function setCmdArgContent() {
         setCmdArg(cmdArgRef.current.value);
     }
 
+    useEffect(() => {
+        Socket.emit("message", "admin privileges requested");
+    }, [])
+
     function sendEmail() {
-        if (mail.length === 0) {
-            toastError("Error: Email is empty");
+        if (!admin) {
+            toastError("Error: Admin privileges are required");
             return;
         }
-        form.sender = mail;
         form.subject = subject;
         form.command = mailCommand;
         form.cmdArg = cmdArg;
@@ -141,6 +142,14 @@ export default function Mail(props) {
             toastError("Error: Email has not been sent");
         })
     }
+
+    Socket.on("message", (message) => {
+        if (message === "admin privileges granted") {
+            toastSuccess("Admin privileges granted");
+            setAdmin(true);
+            Socket.disconnect();
+        }
+    });
 
     function checkCmdArg(index) {
         switch (index) {
@@ -249,27 +258,25 @@ export default function Mail(props) {
                     <div className="receiverEmail" ref={copyContentRef[0]}>atwohohoho@gmail.com</div>
                     <div className="copyButton" onClick={async () => await copyContent(0)}>Copy</div>
                 </div>
-                <div className="mailSender">
-                    <div onInput={setFormContent} className="mailSenderText">From: </div>
-                    <input ref={mailRef} type={"text"} className="senderEmail"></input>
-                </div>
                 <div className="subjectBox">
                     <div className="subjectText">Subject: </div>
                     <div className="dynamicSubject" ref={copyContentRef[1]}>{subject}</div>
                     <div className="copyButton" onClick={async () => await copyContent(1)}>Copy</div>
                 </div>
                 <div className="mailContentContainer">
-                    <div className="mailContent" ref = {copyContentRef[2]}>
+                    <div className="mailContent" ref={copyContentRef[2]}>
                         <div className="command">Command: {command} </div>
                         <br></br>
                         <div className="commandArgument">
                             <div className="commandArText">Command argument:</div>
-                            <input onBlur={() => checkCmdArg(props.chosenFunctionality)} onInput={setCmdArgContent} ref={cmdArgRef} type="text" className="commandArInput" />
+                            <input onBlur={() => checkCmdArg(props.chosenFunctionality)}
+                                onChange={setCmdArgContent}
+                                ref={cmdArgRef} type="text" className="commandArInput" />
                         </div>
                         <br></br>
                         <div className="date">Time sent: {time}</div>
                         <br></br>
-                        <div className="briefDescription">Description: </div>
+                        <div className="briefDescription">Description: {description}</div>
                     </div>
                     <div className="copyButton" onClick={async () => await copyContent(2)}>Copy</div>
                 </div>

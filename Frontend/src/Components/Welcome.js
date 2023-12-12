@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../Styles/Welcome.css';
 import Loading from './Loading';
+import Socket from './Socket'; // Import the 'Socket' module
 
 export default function Welcome(props) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // Simulate a 1-second delay
+        Socket.connect();
         const timer = setTimeout(() => {
             setLoading(false);
         }, 2000);
