@@ -5,6 +5,7 @@ import * as Icon from "ionicons/icons";
 import { toastError, toastSuccess } from "./Toast";
 import axios from "axios";
 import Socket from "./Socket";
+import { toast } from "react-toastify";
 const lodash = require("lodash");
 
 export default function Mail(props) {
@@ -32,7 +33,7 @@ export default function Mail(props) {
         "Take a screenshot of the computer after the given time in seconds",
         "Get the keystrokes of the computer during the given time in seconds",
         "Terminate a task with the given PID",
-        "Get the folder tree of the computer. The computer username is: Seapeas. e.g. 'C:/Users/Seapeas/Desktop'",
+        "Get the folder tree of the computer. The computer username is: Seapeas. e.g. C:/Users/Seapeas/Desktop",
         "Get the system info of the computer",
     ]
     function updateTime() {
@@ -46,68 +47,58 @@ export default function Mail(props) {
         toastSuccess("Copied to clipboard");
     }
 
-    function setMailContent(index, command, time = 0, task_number = 0, PID = 0, folderName = "C:/Users/dodin/Desktop") {
+    function setMailContent(index, command, time = 0, task_number = 0, PID = 0, folderName = "C:/Users/Seapeas/Desktop") {
         setDescription(descriptionArr[index]);
         switch (index) {
             case 0:
                 setSubject("[RDCVE] Shutdown");
                 setCommand("Shutdown " + time);
                 setMailCommand("Shutdown");
-                setDescription("Shutdown the computer after the given time in seconds");
                 break;
             case 1:
                 setSubject("[RDCVE] Sleep");
                 setCommand("Sleep " + time);
                 setMailCommand("Sleep");
-                setDescription("Put the computer to sleep after the given time in seconds");
                 break;
             case 2:
                 setSubject("[RDCVE] MAC/IP");
                 setCommand("MAC/IP");
                 setMailCommand("MAC/IP");
-                setDescription("Get the MAC and IP address of the computer");
                 break;
             case 3:
                 setSubject("[RDCVE] Task Manager");
                 setCommand("Task Manager " + task_number); // 0 for all, 1 for running, 2 for not responding, 3 for RAM, 4 for CPU
                 setMailCommand("Task Manager");
-                setDescription("Get the list of running processes with ports and PIDs");
                 break;
             case 4:
                 setSubject("[RDCVE] Terminal");
                 setCommand("Terminal ", command);
                 setMailCommand("Terminal");
-                setDescription("Run a command in the terminal");
                 break;
             case 5:
                 setSubject("[RDCVE] Screenshot");
                 setCommand("Screenshot");
                 setMailCommand("Screenshot");
-                setDescription("Take a screenshot of the computer");
                 break;
             case 6:
                 setSubject("[RDCVE] Keylogger");
                 setCommand("Keylogger");
                 setMailCommand("Keylogger");
-                setDescription("Get the keystrokes of the computer");
                 break;
             case 7:
                 setSubject("[RDCVE] Terminate");
                 setCommand("Terminate " + PID);
                 setMailCommand("Terminate");
-                setDescription("Terminate the a task with the given PID");
                 break;
             case 8:
                 setSubject("[RDCVE] Folder Tree");
                 setCommand("Folder Tree " + folderName);
                 setMailCommand("Folder Tree");
-                setDescription("Get the folder tree of the computer. The computer username is: dodin");
                 break;
             case 9:
                 setSubject("[RDCVE] System Info");
                 setCommand("System Info");
                 setMailCommand("System Info");
-                setDescription("Get the system info of the computer.");
                 break;
             default:
                 toastError("Error: Invalid command")
@@ -152,6 +143,11 @@ export default function Mail(props) {
     });
 
     function checkCmdArg(index) {
+        if (cmdArg.length === 0) {
+            setCmdArg("0");
+            cmdArgRef.current.value = "0";
+            return;
+        }
         switch (index) {
             case 0:
                 if (!isFinite(cmdArg)) {
@@ -183,7 +179,7 @@ export default function Mail(props) {
                 return true;
             case 4:
                 if (!lodash.isString(cmdArg)) {
-                    toastError("Error: Command argument is not needed");
+                    toastError("Error: Invalid command");
                     return false;
                 }
                 return true;
@@ -196,7 +192,7 @@ export default function Mail(props) {
                 return true;
             case 6:
                 if (cmdArg.length !== 0) {
-                    toastError("Error: Command argument is not needed");
+                    toastError("Error: Invalid time");
                     return false;
                 }
                 return true;
@@ -217,10 +213,6 @@ export default function Mail(props) {
                 setFolderName(cmdArg);
                 return true;
             case 9:
-                if (cmdArg.length !== 0) {
-                    toastError("Error: Command argument is not needed");
-                    return false;
-                }
                 return true;
             default:
                 break;

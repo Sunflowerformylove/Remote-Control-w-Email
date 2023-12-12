@@ -1,7 +1,7 @@
 import os
 
 def getFolderTree(directory):
-    tree = ''
+    tree = '\n'
     for root, dirs, files in os.walk(directory):
         level = root.replace(directory, '').count(os.sep)
         indent = ' ' * 4 * (level)

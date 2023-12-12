@@ -86,7 +86,7 @@ app.post('/api/sendMail', async (request, response) => {
             raw: Buffer.from(`From: ${email}\nTo: ${'atwohohoho@gmail.com'}\nSubject: ${subject}\n\n[RDCVE]\n${command}\n${cmdArg}`).toString('base64')
         }
     });
-    if(!res) {
+    if (!res) {
         response.status(500).send('Error sending mail')
     }
 });
