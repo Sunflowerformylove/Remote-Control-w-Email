@@ -40,7 +40,6 @@ creds = None
 service = None
 reportPath = None
 
-
 def buildService():
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
