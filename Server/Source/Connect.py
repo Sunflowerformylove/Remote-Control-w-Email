@@ -35,3 +35,4 @@ def start_socketio():
     print('Starting socketio...')
     http_server = WSGIServer(('', port), app)
     http_server.serve_forever()
+    print('Awaiting messages from client...')
