@@ -52,7 +52,6 @@ app.use(cors({
     credentials: true
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(express.static('Public'));
 app.use(session({
