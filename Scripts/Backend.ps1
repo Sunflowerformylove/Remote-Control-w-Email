@@ -31,6 +31,7 @@ if ($connection.TcpTestSucceeded) {
 }
 
 Set-Location -Path $backendPath
+npm install --silent
 node --no-deprecation ./dist/bundle.js
 
 Write-Host "Backend.ps1 is running the server for the Electron app or the React app" -ForegroundColor Green
