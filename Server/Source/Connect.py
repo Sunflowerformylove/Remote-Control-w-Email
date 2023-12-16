@@ -33,6 +33,6 @@ def start_socketio():
     global app
     global http_server
     print('Starting socketio...')
+    print('Awaiting messages from client...')
     http_server = WSGIServer(('', port), app)
     http_server.serve_forever()
-    print('Awaiting messages from client...')

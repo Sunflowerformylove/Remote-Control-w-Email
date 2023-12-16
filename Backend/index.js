@@ -1,15 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const morgan = require('morgan');
 const path = require('path');
+const shell = require('shelljs');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 const OAuth2Client = google.auth.OAuth2Client;
+const net = require('net');
 const fs = require('fs');
-const session = require('express-session');
-const { get } = require('http');
 const app = express();
 const PORT = 3001;
 const SCOPES = ['https://mail.google.com/']
@@ -54,21 +53,6 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('Public'));
-app.use(session({
-    secret: 'secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 15, // 15 days
-        secure: false,
-        httpOnly: false,
-    }
-}))
-
-app.listen(PORT, (err) => {
-    if (err) console.error(err.message);
-    console.log(`Server is running on PORT ${PORT}`)
-});
 
 app.post('/api/sendMail', async (request, response) => {
     const auth = await getAuthClient();
@@ -77,7 +61,6 @@ app.post('/api/sendMail', async (request, response) => {
     const subject = request.body.subject;
     const cmdArg = request.body.cmdArg;
     const command = request.body.command;
-    console.log(cmdArg)
     const res = await gmail.users.messages.send({
         auth: auth,
         userId: 'me',
@@ -88,4 +71,8 @@ app.post('/api/sendMail', async (request, response) => {
     if (!res) {
         response.status(500).send('Error sending mail')
     }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
 });

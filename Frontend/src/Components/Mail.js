@@ -119,6 +119,10 @@ export default function Mail(props) {
             toastError("Error: Admin privileges are required");
             return;
         }
+        else if(cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
+            toastError("Error: Command argument is required");
+            return;
+        }
         form.subject = subject;
         form.command = mailCommand;
         form.cmdArg = cmdArg;
@@ -143,7 +147,7 @@ export default function Mail(props) {
     });
 
     function checkCmdArg(index) {
-        if (cmdArg.length === 0) {
+        if (cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
             setCmdArg("0");
             cmdArgRef.current.value = "0";
             return;
