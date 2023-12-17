@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const shell = require('shelljs');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;

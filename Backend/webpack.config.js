@@ -8,7 +8,4 @@ module.exports = {
         filename: 'bundle.js'
     },
     mode: 'production'
-    // externals: {
-    //     express: 'commonjs express' // exclude express from being bundled
-    // }
 };
