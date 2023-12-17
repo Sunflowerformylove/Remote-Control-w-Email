@@ -5,7 +5,6 @@ import * as Icon from "ionicons/icons";
 import { toastError, toastSuccess } from "./Toast";
 import axios from "axios";
 import Socket from "./Socket";
-import { toast } from "react-toastify";
 const lodash = require("lodash");
 
 export default function Mail(props) {
@@ -109,10 +108,6 @@ export default function Mail(props) {
     function setCmdArgContent() {
         setCmdArg(cmdArgRef.current.value);
     }
-
-    useEffect(() => {
-        Socket.emit("message", "admin privileges requested");
-    }, [])
 
     function sendEmail() {
         if (!admin) {
@@ -224,9 +219,7 @@ export default function Mail(props) {
     }
 
     useEffect(() => {
-    }, [props.chosenFunctionality])
-
-    useEffect(() => {
+        checkCmdArg(props.chosenFunctionality);
         setMailContent(props.chosenFunctionality, command, second, task_number, PID, folderName);
     }, [props.chosenFunctionality, command, second, task_number, PID, folderName]);
 
@@ -245,6 +238,15 @@ export default function Mail(props) {
             setPID(0);
         }
     }, [second, task_number, PID]);
+
+    useEffect(() => {
+        if(Socket.disconnected){
+            Socket.connect();
+        }
+        if(!admin){
+            Socket.emit("message", "admin privileges requested");
+        }
+    }, [admin]);
 
     return (<>
         <div className="mailContainer">

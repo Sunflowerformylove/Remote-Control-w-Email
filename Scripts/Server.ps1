@@ -9,29 +9,33 @@ try{
     
     $connection = Test-NetConnection -ComputerName "localhost" -Port $port
     
-    if ($connection.TcpTestSucceeded) {
-        Write-Host "Port $port is already in use" -ForegroundColor Red
-        Write-Host "Do you want to kill the process that is using port $port? (y/n)" -ForegroundColor Yellow
+    function Kill-Port($port){
+        $connection = Test-NetConnection -ComputerName "localhost" -Port $port
+        if ($connection.TcpTestSucceeded) {
+            Write-Host "Port $port is already in use" -ForegroundColor Red
+            Write-Host "Do you want to kill the process that is using port $port? (y/n)" -ForegroundColor Yellow
     
-        do {
-            $answer = Read-Host
-        } while ($answer -ne "y" -and $answer -ne "n")
+            do {
+                $answer = Read-Host
+            } while ($answer -ne "y" -and $answer -ne "n")
     
-        if ($answer -eq "y") {
-            $process = Get-Process -Id (Get-NetTCPConnection -LocalPort $port).OwningProcess
-            $process | Stop-Process -Force
-            Write-Host "The process that was using port $port has been killed" -ForegroundColor Green
-        }
-        else {
-            Write-Host "The process that was using port $port has not been killed" -ForegroundColor Red
-            Write-Host "The server will not be started" -ForegroundColor Red
-            pause
-            exit
+            if ($answer -eq "y") {
+                $process = Get-Process -Id (Get-NetTCPConnection -LocalPort $port).OwningProcess
+                $process | Stop-Process -Force
+                Write-Host "The process that was using port $port has been killed" -ForegroundColor Green
+            }
+            else {
+                Write-Host "The process that was using port $port has not been killed" -ForegroundColor Red
+                Write-Host "The server will not be started" -ForegroundColor Red
+                pause
+                exit
+            }
         }
     }
     
+    Kill-Port $port
     Set-Location -Path $parentPath
-    pip3 install -r requirement.txt
+    pip3 install -r requirement.txt --quiet
     python Server/Source/Server.py
     
     Write-Host "Server.ps1 is running the server for the Electron app or the React app" -ForegroundColor Green
@@ -41,6 +45,16 @@ try{
     catch {
         Write-Host "An error occurred" -ForegroundColor Red
         Write-Host "The error message is: $_" -ForegroundColor Red
-        pause
-        exit
+        Write-Host "Do you want to restart the server? (y/n)" -ForegroundColor Yellow
+        $res = Read-Host
+        if($res -eq "y"){
+            cls
+            Kill-Port $port
+            python Server/Source/Server.py
+        }
+        else{
+            pause
+            Read-Host -Prompt "Press Enter to exit"
+            exit
+        }
     }

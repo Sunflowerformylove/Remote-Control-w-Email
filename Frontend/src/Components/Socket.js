@@ -1,8 +1,5 @@
 import { io } from "socket.io-client";
 const URL = "http://localhost:5000";
-const Socket = io(URL, {autoConnect: true});
-Socket.onAny((event,...args) => {
-    console.log(event, args);
-})
+const Socket = io(URL, {autoConnect: false});
 
 export default Socket;
