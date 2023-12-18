@@ -4,7 +4,9 @@ import { IonIcon } from "@ionic/react";
 import * as Icon from "ionicons/icons";
 import { toastError, toastSuccess } from "./Toast";
 import axios from "axios";
-import Socket from "./Socket";
+import { io } from "socket.io-client";
+const URL = "http://localhost:5000";
+let Socket = io(URL, {autoConnect: false});
 const lodash = require("lodash");
 
 export default function Mail(props) {
@@ -22,6 +24,8 @@ export default function Mail(props) {
     const [termCommand, setTermCommand] = useState("");
     const [cmdArg, setCmdArg] = useState("");
     const cmdArgRef = useRef(null);
+    const IPv4Ref = useRef(null);
+    const [IPv4, setIPv4] = useState("");
     const copyContentRef = [useRef(null), useRef(null), useRef(null)];
     const descriptionArr = [
         "Turn off the computer after the given time in seconds",
@@ -218,6 +222,16 @@ export default function Mail(props) {
         }
     }
 
+    function setSocketAddress(){
+        setIPv4(IPv4Ref.current.value);
+        const newURL = "http://" + IPv4 + ":5000";
+        if(Socket.connected){
+            Socket.disconnect();
+        }
+        Socket = io(newURL, {autoConnect: false});
+        Socket.connect();
+    }
+
     useEffect(() => {
         checkCmdArg(props.chosenFunctionality);
         setMailContent(props.chosenFunctionality, command, second, task_number, PID, folderName);
@@ -255,6 +269,10 @@ export default function Mail(props) {
                     <div className="mailReceiverText">To: </div>
                     <div className="receiverEmail" ref={copyContentRef[0]}>atwohohoho@gmail.com</div>
                     <div className="copyButton" onClick={async () => await copyContent(0)}>Copy</div>
+                </div>
+                <div className="subjectBox">
+                    <div className="subjectText">IP of server comp: </div>
+                    <input type="text" className="commandArInput" ref ={IPv4Ref} onChange={setSocketAddress}/>
                 </div>
                 <div className="subjectBox">
                     <div className="subjectText">Subject: </div>

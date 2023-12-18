@@ -1,7 +1,8 @@
 import socketio
+import requests
 from gevent.pywsgi import WSGIServer
 port = 5000
-sio = socketio.Server(cors_allowed_origins='*')
+sio = socketio.Server(cors_allowed_origins='*', )
 app = socketio.WSGIApp(sio)
 sio.always_connect = True
 sio.connect_timeout = 10
@@ -34,5 +35,5 @@ def start_socketio():
     global http_server
     print('Starting socketio...')
     print('Awaiting messages from client...')
-    http_server = WSGIServer(('', port), app)
+    http_server = WSGIServer(('0.0.0.0', port), app)
     http_server.serve_forever()
