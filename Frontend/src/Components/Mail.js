@@ -4,13 +4,9 @@ import { IonIcon } from "@ionic/react";
 import * as Icon from "ionicons/icons";
 import { toastError, toastSuccess } from "./Toast";
 import axios from "axios";
-import { io } from "socket.io-client";
-const URL = "http://localhost:5000";
-let Socket = io(URL, {autoConnect: false});
 const lodash = require("lodash");
 
 export default function Mail(props) {
-    const [admin, setAdmin] = useState(false);
     const [time, setTime] = useState("");
     const [subject, setSubject] = useState("");
     const [command, setCommand] = useState("");
@@ -114,11 +110,7 @@ export default function Mail(props) {
     }
 
     function sendEmail() {
-        if (!admin) {
-            toastError("Error: Admin privileges are required");
-            return;
-        }
-        else if(cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
+        if(cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
             toastError("Error: Command argument is required");
             return;
         }
@@ -136,14 +128,6 @@ export default function Mail(props) {
             toastError("Error: Email has not been sent");
         })
     }
-
-    Socket.on("message", (message) => {
-        if (message === "admin privileges granted") {
-            toastSuccess("Admin privileges granted");
-            setAdmin(true);
-            Socket.disconnect();
-        }
-    });
 
     function checkCmdArg(index) {
         if (cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
@@ -222,16 +206,6 @@ export default function Mail(props) {
         }
     }
 
-    function setSocketAddress(){
-        setIPv4(IPv4Ref.current.value);
-        const newURL = "http://" + IPv4 + ":5000";
-        if(Socket.connected){
-            Socket.disconnect();
-        }
-        Socket = io(newURL, {autoConnect: false});
-        Socket.connect();
-    }
-
     useEffect(() => {
         checkCmdArg(props.chosenFunctionality);
         setMailContent(props.chosenFunctionality, command, second, task_number, PID, folderName);
@@ -253,15 +227,6 @@ export default function Mail(props) {
         }
     }, [second, task_number, PID]);
 
-    useEffect(() => {
-        if(Socket.disconnected){
-            Socket.connect();
-        }
-        if(!admin){
-            Socket.emit("message", "admin privileges requested");
-        }
-    }, [admin]);
-
     return (<>
         <div className="mailContainer">
             <div className="mail">
@@ -271,17 +236,13 @@ export default function Mail(props) {
                     <div className="copyButton" onClick={async () => await copyContent(0)}>Copy</div>
                 </div>
                 <div className="subjectBox">
-                    <div className="subjectText">IP of server comp: </div>
-                    <input type="text" className="commandArInput" ref ={IPv4Ref} onChange={setSocketAddress}/>
-                </div>
-                <div className="subjectBox">
                     <div className="subjectText">Subject: </div>
                     <div className="dynamicSubject" ref={copyContentRef[1]}>{subject}</div>
                     <div className="copyButton" onClick={async () => await copyContent(1)}>Copy</div>
                 </div>
                 <div className="mailContentContainer">
                     <div className="mailContent" ref={copyContentRef[2]}>
-                        <div className="command">Command: {command} </div>
+                        <div className="command">Command: {command} {cmdArg} </div>
                         <br></br>
                         <div className="commandArgument">
                             <div className="commandArText">Command argument:</div>
