@@ -8,7 +8,7 @@ try{
 
     Set-Location -Path $parentPath
     pip3 install -r requirement.txt --quiet
-    python -ArgumentList Server/Source/Server.py
+    python Server/Source/Server.py
     
     Write-Host "Server.ps1 is running the server for the Electron app or the React app" -ForegroundColor Green
     Write-Host "Don't close this window" -ForegroundColor Green
