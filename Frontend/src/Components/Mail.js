@@ -20,8 +20,6 @@ export default function Mail(props) {
     const [termCommand, setTermCommand] = useState("");
     const [cmdArg, setCmdArg] = useState("");
     const cmdArgRef = useRef(null);
-    const IPv4Ref = useRef(null);
-    const [IPv4, setIPv4] = useState("");
     const copyContentRef = [useRef(null), useRef(null), useRef(null)];
     const descriptionArr = [
         "Turn off the computer after the given time in seconds",

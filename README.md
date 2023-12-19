@@ -14,4 +14,7 @@ The requirement to run this application is as follow:
 
 ## Installation
 
+- Run the Remote Desktop Controller 1.0.0.msi in Package folder for Frontend.
+- Run the Backend.ps1 and Server.ps1 scripts.
+
 ## Illustrations of application
