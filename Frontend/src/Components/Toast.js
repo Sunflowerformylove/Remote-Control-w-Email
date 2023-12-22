@@ -28,6 +28,7 @@ export function toastSuccess(message, callback) {
         progress: undefined,
         theme: "dark",
         onClose: callback,
+        
         style: { 
             fontSize: "1.8rem !important",
             fontFamily: "Poppins, sans-serif",

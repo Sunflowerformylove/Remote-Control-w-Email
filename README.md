@@ -14,48 +14,7 @@ The requirement to run this application is as follow:
 
 ## Installation
 
-The installation of this application could be done within these steps:
-
-- First, clone or download the application from Github for both client and server computers: [Sunflowerformylove/Remote-Control-w-Email (github.com)](https://github.com/Sunflowerformylove/Remote-Control-w-Email). You can use this to clone the project in **cmd** or **powershell**.
-
-  ```powershell
-  cd Desktop
-  git clone https://github.com/Sunflowerformylove/Remote-Control-w-Email
-  ```
-
-- Second, install the latest stable version of NodeJS on the client computer.
-- Third, install the latest stable version of Python on the server computer.
-- Fourth, on client computer, open **cmd** or **powershell**, run this code on 2 different tabs of terminal:
-
-  ```powershell
-  cd C:\Users\<User>\Desktop\Remote-Control-w-Email\Backend
-  npm install
-  ```
-
-  ```powershell
-  cd C:\Users\<User>\Desktop\Remote-Control-w-Email\Frontend
-  npm install
-  ```
-
-- Fifth, on server computer, open **cmd** or **powershell**, run this code on 1 tab of terminal:
-
-  ```powershell
-  cd C:\Users\<User>\Desktop\Remote-Control-w-Email
-  pip3 install -r requirement.txt
-  ```
-
-- Seventh, on client computer, run this code on both tab of terminal:
-
-  ```powershell
-  npm start
-  ```
-
-- Eighth, on server computer, run this code:
-
-  ```powershell
-    python Server\Source\Server.py
-  ```
-
-**Note: To ensure user experience and the program running as well as possible, run start the server before the backend and the frontend.
+- Run the Remote Desktop Controller 1.0.0.msi in Package folder for Frontend.
+- Run the Backend.ps1 and Server.ps1 scripts.
 
 ## Illustrations of application

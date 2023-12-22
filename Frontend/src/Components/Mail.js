@@ -4,12 +4,9 @@ import { IonIcon } from "@ionic/react";
 import * as Icon from "ionicons/icons";
 import { toastError, toastSuccess } from "./Toast";
 import axios from "axios";
-import Socket from "./Socket";
-import { toast } from "react-toastify";
 const lodash = require("lodash");
 
 export default function Mail(props) {
-    const [admin, setAdmin] = useState(false);
     const [time, setTime] = useState("");
     const [subject, setSubject] = useState("");
     const [command, setCommand] = useState("");
@@ -110,13 +107,9 @@ export default function Mail(props) {
         setCmdArg(cmdArgRef.current.value);
     }
 
-    useEffect(() => {
-        Socket.emit("message", "admin privileges requested");
-    }, [])
-
     function sendEmail() {
-        if (!admin) {
-            toastError("Error: Admin privileges are required");
+        if(cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
+            toastError("Error: Command argument is required");
             return;
         }
         form.subject = subject;
@@ -134,16 +127,8 @@ export default function Mail(props) {
         })
     }
 
-    Socket.on("message", (message) => {
-        if (message === "admin privileges granted") {
-            toastSuccess("Admin privileges granted");
-            setAdmin(true);
-            Socket.disconnect();
-        }
-    });
-
     function checkCmdArg(index) {
-        if (cmdArg.length === 0) {
+        if (cmdArg.length === 0 || cmdArgRef.current.value.length === 0) {
             setCmdArg("0");
             cmdArgRef.current.value = "0";
             return;
@@ -220,9 +205,7 @@ export default function Mail(props) {
     }
 
     useEffect(() => {
-    }, [props.chosenFunctionality])
-
-    useEffect(() => {
+        checkCmdArg(props.chosenFunctionality);
         setMailContent(props.chosenFunctionality, command, second, task_number, PID, folderName);
     }, [props.chosenFunctionality, command, second, task_number, PID, folderName]);
 
@@ -257,7 +240,7 @@ export default function Mail(props) {
                 </div>
                 <div className="mailContentContainer">
                     <div className="mailContent" ref={copyContentRef[2]}>
-                        <div className="command">Command: {command} </div>
+                        <div className="command">Command: {command} {cmdArg} </div>
                         <br></br>
                         <div className="commandArgument">
                             <div className="commandArText">Command argument:</div>
