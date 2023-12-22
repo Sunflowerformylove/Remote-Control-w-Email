@@ -141,7 +141,7 @@ def checkRequirement(lines):
             print(report)
             if command_execute != "Screenshot":
                 try:
-                    with open("report.txt", 'w') as file:
+                    with open("report.txt", 'w', encoding="utf-8") as file:
                         file.write(report)
                         print(f"Report has been saved to report.txt")
                 except Exception as e:
@@ -159,9 +159,9 @@ def sendReport(email_sender):
 
     try:
         if command_execute != "Screenshot":
-            with open('report.txt', 'r') as file:
+            with open('report.txt', 'r', encoding="utf-8") as file:
                 attachment = MIMEBase('application', 'octet-stream')
-                attachment.set_payload(file.read())
+                attachment.set_payload(file.read().encode('utf-8'))
                 encoders.encode_base64(attachment)
                 attachment.add_header(
                     'Content-Disposition', 'attachment', filename='report.txt')

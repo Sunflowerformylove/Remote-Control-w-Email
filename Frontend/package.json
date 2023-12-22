@@ -4,12 +4,14 @@
 	"description": "Remote controller with mail",
 	"version": "1.0.0",
 	"private": true,
+	"main": "./public/electron.js",
+	"homepage": "./",
 	"build": {
 		"appId": "RDCVE",
 		"productName": "Remote Desktop Controller",
 		"icon": "./public/favicon.ico",
 		"directories": {
-			"output": "Package"
+			"output": "../Package"
 		},
 		"win": {
 			"target": "msi",
@@ -32,8 +34,6 @@
 		"react-scripts": "^5.0.1",
 		"react-toastify": "^9.1.3"
 	},
-	"main": "public/electron.js",
-	"homepage": "./",
 	"scripts": {
 		"start-react": "react-scripts start",
 		"build-react": "react-scripts build",

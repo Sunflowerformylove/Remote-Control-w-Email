@@ -176,7 +176,7 @@ export default function Mail(props) {
                 setPID(cmdArg);
                 return true;
             case 6:
-                if (cmdArg.length !== 0) {
+                if (cmdArg.length === 0 || cmdArgRef.current.value.length === 0 || cmdArg < 0) {
                     toastError("Error: Invalid time");
                     return false;
                 }

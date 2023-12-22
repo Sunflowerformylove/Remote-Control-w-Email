@@ -6,6 +6,7 @@ Write-Host "This script is safe to run or execute if it is downloaded from Githu
 $parentPath = Split-Path $PSScriptRoot -Parent
 
 Set-Location -Path $parentPath
+chcp 65001
 pip3 install -r requirement.txt --quiet
 python Server/Source/Server.py
 
