@@ -30,6 +30,6 @@ The requirement to run this application is as follow:
 
 ## Table of functionality
 
-![RDCVE]("https://github.com/Sunflowerformylove/Remote-Control-w-Email/blob/3dfe55de7f5f6d3052df4ebcd00067f1bc1d81a5/Images/Screenshot%202023-12-22%20164305.png")
+![RDCVE](https://github.com/Sunflowerformylove/Remote-Control-w-Email/blob/64198fb9741860a45817b8e4a405d824189492a6/Images/Screenshot%202023-12-22%20164305.png)
 
 ## Images from application
