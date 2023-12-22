@@ -11,10 +11,25 @@ The requirement to run this application is as follow:
 - Microsoft Windows Operating System 10 or 11.
 - NodeJS 21.4.0.
 - Python 3.12.1.
+- Powershell or Shell enabled.
+- Script running enabled.
 
 ## Installation
 
-- Run the Remote Desktop Controller 1.0.0.msi in Package folder for Frontend.
-- Run the Backend.ps1 and Server.ps1 scripts.
+- Run the Remote Desktop Controller 1.0.0.msi in Package folder for installing Frontend.
+- Run the Backend.ps1 and Server.ps1 scripts by using Run with powershell or using command.
 
-## Illustrations of application
+  ```shell
+  Set-Location C:/Users/<User>/Desktop/Remote-Control-w-Email/Script
+  pwsh ./Backend.ps1
+  or
+  ./Backend.ps1
+  ```
+
+  Noted: this is for referrence only, and the code is only apply if folder is saved to desktop
+
+## Table of functionality
+
+![RDCVE]("./Images/Screenshot 2023-12-22 164305.png")
+
+## Images from application
